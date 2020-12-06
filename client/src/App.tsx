@@ -1,7 +1,8 @@
 import { AppBar, CssBaseline, Toolbar, Typography, useMediaQuery } from "@material-ui/core";
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import React, { useMemo } from 'react';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, useHistory } from "react-router-dom";
+import LandingPage from "./pages/Landing";
 import LoginPage from "./pages/Login";
 
 function App() {
@@ -31,7 +32,8 @@ function App() {
         </AppBar>
 
         <Switch>
-          <Route path="/"><LoginPage /></Route>
+          <Route exact path="/"><LoginPage /></Route>
+          <Route path="/home"><LandingPage /></Route>
         </Switch>
       </Router>
     </ThemeProvider>

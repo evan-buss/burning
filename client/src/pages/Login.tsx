@@ -1,8 +1,8 @@
 import { Button, Grid, makeStyles, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { v4 } from "uuid";
-import { getTokenFromPin, Credentials, getAuthURL, getPin, TokenResponse } from "../services/auth";
+import { getTokenFromPin, Credentials, getAuthURL, getPin, isTokenValid } from "../services/auth";
 
 // A custom hook that builds on useLocation to parse
 // the query string for you.
@@ -26,40 +26,82 @@ const useStyles = makeStyles({
 const LoginPage: React.FC = () => {
     const query = useQuery();
     const classes = useStyles();
-    const [clientId, setClientId] = useState(v4());
     const [authURL, setAuthURL] = useState<string>("");
-    const [accessToken, setAccessToken] = useState<string>("");
-    const [tokens, setTokens] = useState<TokenResponse>();
+    const [disabled, setDisabled] = useState(true);
+    const history = useHistory();
 
-    const [credentials, setCredentials] = useState<Credentials>({} as Credentials);
+    const [credentials, setCredentials] =
+        useState({
+            accessToken: localStorage.getItem("accessToken") ?? undefined,
+            clientId: localStorage.getItem("clientId") ?? v4(),
+            pins: {
+                id: sessionStorage.getItem("pinId") ?? null,
+                code: sessionStorage.getItem("pinCode") ?? null
+            }
+        } as Credentials);
 
+
+    //1) Choose a unique app name, like “My Cool Plex App”
+    //2) Check storage for your app’s Client Identifier; generate and store one if none is present.
+    //3) Check storage for the user’s Access Token; if present, verify its validity and carry on.
+    //4) If an Access Token is missing or invalid, generate a PIN, and store its id.
+    //5) Construct an Auth App url and send the user’s browser there to authenticate.
+    //6) After authentication, check the PIN’s id to obtain and store the user’s Access Token.
     useEffect(() => {
-        const _cachedClientId = localStorage.getItem("clientId");
-        if (_cachedClientId !== null) {
-            setClientId(_cachedClientId);
-            setCredentials((prev) => {
-                return { ...prev, clientId: _cachedClientId }
-            });
+        localStorage.setItem("clientId", credentials.clientId);
+
+        if (credentials.accessToken) {
+            history.push('/home');
+            return;
         }
 
-        const _cachedAccessToken = localStorage.getItem("accessToken");
-        if (_cachedAccessToken !== null) {
-            // Generate new token via postback api here    
-        } else {
-            // Verify token validity and use it if valid
-        }
-
-
+        // User logged in. Get their access token.
         if (query.has("postback")) {
-            getTokenFromPin(tokens?.id, token.code,)
+            console.log("WE GOT A POSTBACK");
+            getTokenFromPin(credentials.clientId, credentials.pins.id, credentials.pins.code)
+                .then(authToken => {
+                    setCredentials(creds => {
+                        creds.accessToken = authToken;
+                        return creds;
+                    });
+                    localStorage.setItem("accessToken", authToken);
+
+                    console.log("Success???");
+                })
+                .catch(error => console.log(error));
             console.log("postback");
-        } else {
-            getPin(clientId).then((tokens) => {
-                setTokens(tokens)
-                setAuthURL(getAuthURL(tokens.code, clientId))
-            });
+            return;
         }
-    }, [clientId, query]);
+
+        if (credentials.accessToken) {
+            isTokenValid(credentials.clientId, credentials.accessToken).then((isValid) => {
+                if (!isValid) {
+                    getPin(credentials.clientId).then(pins => {
+                        sessionStorage.setItem("pinId", pins.id);
+                        sessionStorage.setItem("pinCode", pins.code);
+                        setCredentials((creds) => {
+                            creds.pins = pins;
+                            return creds;
+                        });
+                        setAuthURL(getAuthURL(credentials.clientId, credentials.pins.code));
+                        setDisabled(false);
+                    });
+                }
+            });
+        } else {
+            getPin(credentials.clientId).then(pins => {
+                sessionStorage.setItem("pinId", pins.id);
+                sessionStorage.setItem("pinCode", pins.code);
+                setCredentials((creds) => {
+                    creds.pins = pins;
+                    return creds;
+                });
+                setAuthURL(getAuthURL(credentials.clientId, credentials.pins.code));
+                setDisabled(false);
+            })
+        }
+
+    }, []);
 
 
     return (
@@ -73,7 +115,8 @@ const LoginPage: React.FC = () => {
             <Button href={authURL}
                 className={classes.plexButton}
                 variant="contained"
-                color="secondary">
+                color="secondary"
+                disabled={disabled}>
                 Log In With Plex
             </Button>
         </Grid>
