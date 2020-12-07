@@ -1,38 +1,32 @@
-from fastapi import APIRouter, Depends
+from typing import List, Optional
 
-from models.user import User
+from fastapi import APIRouter, Depends
+from plexapi.myplex import MyPlexUser, MyPlexAccount
+from plexapi.server import PlexServer
+
+from models.credentials import get_plex_account, get_plex_server
 
 router = APIRouter()
 
+
+class PlexAccountUser:
+    id: int
+    name: str
+    thumbnail: str
+    email: Optional[str] = None
+
+    def __init__(self, user: MyPlexUser):
+        self.name = user.title
+        self.id = user.id
+        self.email = user.email
+        self.thumbnail = user.thumb
+
+
 @router.get("/api/users")
-async def get_users(user: User = Depends(User)):
-    return "test"
+def get_users(account: MyPlexAccount = Depends(get_plex_account)) -> List[PlexAccountUser]:
+    return [PlexAccountUser(plex_user) for plex_user in account.users()]
 
 
 @router.get("/api/libraries")
-async def get_libraries(user: User = Depends(User)):
-    print(user.plex_token)
-    print(user.client_id)
-
-    return [section.title for section in user.plex.library.sections()]
-
-# @router.get("/api/test")
-# def list_recents():
-#     plex = PlexServer("http://192.168.1.222:32400", token=token)
-#     return plex.account().users()
-#     # return [acct.name for acct in plex.systemAccounts()]
-#     # print(account)
-#     # return [section.title for section in plex.library.sections()]
-#     # return [movie.title for movie in plex.library.section("Movies Evan").search(unwatched=True)]
-#     # movies = plex.library.section('Movies')
-#     # return movies.search(unwatched=True)
-#
-#
-# @router.get("/api/remote")
-# def list_recents_remote():
-#     account = MyPlexAccount(token=token, username=".Public")
-#     plex = account.resource("Home Media").connect()
-#     return len(plex.library.movies)
-#
-#     # return [user.email for user in plex.users()]
-# return [(device.name, device.publicAddress) for device in account.devices()]
+def get_libraries(plex: PlexServer = Depends(get_plex_server)) -> List[str]:
+    return [section.title for section in plex.library.sections()]
