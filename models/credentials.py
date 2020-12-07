@@ -14,7 +14,10 @@ class Credentials:
 
     def __init__(self, x_plex_token: str = Header(...), x_client_id=Header(...)):
         if x_plex_token is None:
-            raise HTTPException(status_code=401, detail="X-Plex-Token header missing.")
+            raise HTTPException(status_code=401, detail="x-client-id header missing.")
+
+        if x_client_id is None:
+            raise HTTPException(status_code=401, detail="x-client-id header missing.")
 
         self.plex_token = x_plex_token
         self.client_id = x_client_id
@@ -25,7 +28,6 @@ def get_plex_account(creds: Credentials = Depends(Credentials), timeout: int = 1
         associated with the user account. This should only be used for this purpose as it is much slower than
         accessing the server directly via the public IP.
     """
-
     return MyPlexAccount(creds.plex_token, timeout=timeout)
 
 

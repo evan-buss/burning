@@ -2,6 +2,7 @@ import { Button, Grid, makeStyles, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { v4 } from "uuid";
+import { useGlobalStyles } from "../App";
 import { getTokenFromPin, Credentials, getAuthURL, getPin, isTokenValid } from "../services/auth";
 
 // A custom hook that builds on useLocation to parse
@@ -11,9 +12,6 @@ function useQuery() {
 }
 
 const useStyles = makeStyles({
-    fullPage: {
-        height: "calc(100vh - 56px)",
-    },
     title: {
         fontSize: "2em",
     },
@@ -29,6 +27,7 @@ const LoginPage: React.FC = () => {
     const [authURL, setAuthURL] = useState<string>("");
     const [disabled, setDisabled] = useState(true);
     const history = useHistory();
+    const globalClasses = useGlobalStyles();
 
     const [credentials, setCredentials] =
         useState({
@@ -106,7 +105,7 @@ const LoginPage: React.FC = () => {
 
     return (
         <Grid
-            className={classes.fullPage}
+            className={globalClasses.fullPage}
             container
             direction="column"
             justify="center"
@@ -117,7 +116,7 @@ const LoginPage: React.FC = () => {
                 variant="contained"
                 color="secondary"
                 disabled={disabled}>
-                Log In With Plex
+                Log In with Plex Account
             </Button>
         </Grid>
     );
