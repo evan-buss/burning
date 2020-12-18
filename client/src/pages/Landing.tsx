@@ -2,7 +2,6 @@ import { Avatar, ButtonBase, CircularProgress, Grid, IconButton, makeStyles, Pap
 import CloseIcon from "@material-ui/icons/Close";
 import React, { useEffect, useState } from 'react';
 import { useHistory } from "react-router";
-import { useGlobalStyles } from "../App";
 import { getUsers, PlexAccountUser } from "../services/users";
 
 const useStyles = makeStyles({
@@ -26,9 +25,10 @@ const useStyles = makeStyles({
     title: {
         textAlign: "center",
         padding: "1em",
+        paddingBottom: "0.5em",
         fontSize: "2em"
     }
-})
+});
 
 const LandingPage: React.FC = () => {
     const [users, setUsers] = useState<PlexAccountUser[]>([]);
@@ -36,7 +36,6 @@ const LandingPage: React.FC = () => {
     const [open, setOpen] = useState(false);
     const history = useHistory();
     const classes = useStyles();
-    const globalClasses = useGlobalStyles();
 
     useEffect(() => {
         setLoading(true);
@@ -52,13 +51,16 @@ const LandingPage: React.FC = () => {
     }
 
     if (loading) {
-        return (<Grid
-            container
-            className={globalClasses.fullPage}
-            direction="column"
-            justify="center"
-            alignItems="center"><CircularProgress color="secondary" variant="indeterminate" />
-        </Grid>)
+        return (
+            <Grid
+                style={{ height: "100%" }}
+                container
+                direction="column"
+                justify="center"
+                alignItems="center">
+                <CircularProgress variant="indeterminate" />
+            </Grid>
+        );
     }
 
     return (

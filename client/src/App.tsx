@@ -2,20 +2,24 @@ import { AppBar, CssBaseline, Toolbar, Typography, useMediaQuery } from "@materi
 import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
 import React, { useMemo } from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BottomNavBar } from "./components/BottomNavBar";
 import FireLogo from "./components/FireLogo";
 import DashboardPage from "./pages/Dashboard";
+import HistoryPage from "./pages/HistoryPage";
 import LandingPage from "./pages/Landing";
 import LoginPage from "./pages/Login";
 
-export const useGlobalStyles = makeStyles({
-  fullPage: {
-    height: "calc(100vh - 56px)",
-  },
-});
-
 const useStyles = makeStyles({
   logo: {
-    marginRight: 8
+    marginRight: 8,
+  },
+  container: {
+    display: "flex",
+    flexFlow: "column nowrap",
+    height: "100vh",
+  },
+  content: {
+    height: "100%"
   }
 });
 
@@ -27,7 +31,7 @@ function App() {
     () =>
       createMuiTheme({
         palette: {
-          secondary: {
+          primary: {
             main: "#E5A00D",
           },
           type: prefersDarkMode ? 'dark' : 'light',
@@ -40,18 +44,25 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <AppBar position="static" color="inherit">
-          <Toolbar>
-            <FireLogo className={classes.logo} />
-            <Typography variant="h6" color="textPrimary">Burning</Typography>
-          </Toolbar>
-        </AppBar>
+        <div className={classes.container}>
+          <AppBar position="static" color="inherit">
+            <Toolbar>
+              <FireLogo className={classes.logo} />
+              <Typography variant="h6" color="textPrimary">Burning</Typography>
+            </Toolbar>
+          </AppBar>
 
-        <Switch>
-          <Route exact path="/"><LoginPage /></Route>
-          <Route path="/home"><LandingPage /></Route>
-          <Route path="/dashboard"><DashboardPage /></Route>
-        </Switch>
+          <div className={classes.content}>
+            <Switch>
+              <Route exact path="/"><LoginPage /></Route>
+              <Route path="/home"><LandingPage /></Route>
+              <Route path="/dashboard"><DashboardPage /></Route>
+              <Route path="/history"><HistoryPage /></Route>
+            </Switch>
+          </div>
+
+          <BottomNavBar />
+        </div>
       </Router>
     </ThemeProvider>
   );

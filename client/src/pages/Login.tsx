@@ -2,7 +2,6 @@ import { Button, Grid, makeStyles, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { v4 } from "uuid";
-import { useGlobalStyles } from "../App";
 import { getTokenFromPin, Credentials, getAuthURL, getPin, isTokenValid } from "../services/auth";
 
 // A custom hook that builds on useLocation to parse
@@ -27,7 +26,6 @@ const LoginPage: React.FC = () => {
     const [authURL, setAuthURL] = useState<string>("");
     const [disabled, setDisabled] = useState(true);
     const history = useHistory();
-    const globalClasses = useGlobalStyles();
 
     const [credentials, setCredentials] =
         useState({
@@ -39,6 +37,7 @@ const LoginPage: React.FC = () => {
             }
         } as Credentials);
 
+    // TODO: Rewrite this shit...
 
     //1) Choose a unique app name, like “My Cool Plex App”
     //2) Check storage for your app’s Client Identifier; generate and store one if none is present.
@@ -105,7 +104,6 @@ const LoginPage: React.FC = () => {
 
     return (
         <Grid
-            className={globalClasses.fullPage}
             container
             direction="column"
             justify="center"
