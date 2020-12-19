@@ -53,7 +53,7 @@ const UserSelectionPage: React.FC = () => {
 
   useEffect(() => {
     dispatch(getUsers());
-  }, []);
+  }, [dispatch]);
 
   const handleSelect = () => {
     setOpen(true);

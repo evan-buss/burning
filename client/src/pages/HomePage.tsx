@@ -8,7 +8,7 @@ import {
   Select,
   Typography,
 } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LibraryChip } from "../components/LibraryChip";
 import { getServers, selectServer } from "../store/slices/plexSlice";
@@ -33,8 +33,8 @@ const useStyles = makeStyles({
 
 const HomePage: React.FC = () => {
   const classes = useStyles();
-
   const dispatch = useDispatch<AppDispatch>();
+
   const selectedServer = useSelector(
     (state: RootState) => state.plex?.selectedServer
   );
@@ -64,7 +64,7 @@ const HomePage: React.FC = () => {
           <Select
             labelId="server-select"
             id="server-select"
-            // value={selectedServer?.id}
+            value={selectedServer?.id ?? ""}
             onChange={handleServerSelect}
           >
             {serverOptions &&

@@ -61,7 +61,7 @@ const LoginPage: React.FC = () => {
     } else {
       dispatch(fetchPins());
     }
-  }, []);
+  }, [dispatch, history, query, user.accessToken]);
 
   return (
     <Grid
