@@ -1,6 +1,6 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import axios, { AxiosRequestConfig } from "axios";
-import plexReducer from "./slices/plexSlice";
+import plexReducer, { selectedServerSelector } from "./slices/plexSlice";
 import userReducer, { persistUserState } from "./slices/userSlice";
 
 export const store = configureStore({
@@ -17,7 +17,7 @@ axios.interceptors.request.use((config: AxiosRequestConfig) => {
     ...config.headers,
     "x-plex-token": store.getState().user.accessToken,
     "x-client-id": store.getState().user.clientId,
-    "x-server-ip": store.getState().plex?.selectedServer?.ip,
+    "x-server-ip": selectedServerSelector(store.getState())?.ip,
   };
   return config;
 });

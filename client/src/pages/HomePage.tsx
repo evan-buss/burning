@@ -11,7 +11,13 @@ import {
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LibraryChip } from "../components/LibraryChip";
-import { getServers, selectServer } from "../store/slices/plexSlice";
+import { Library } from "../store/models/plex.model";
+import {
+  getServers,
+  selectedServerSelector,
+  selectServer,
+  toggleSelectedLibrary,
+} from "../store/slices/plexSlice";
 import { AppDispatch, RootState } from "../store/store";
 
 const useStyles = makeStyles({
@@ -35,12 +41,8 @@ const HomePage: React.FC = () => {
   const classes = useStyles();
   const dispatch = useDispatch<AppDispatch>();
 
-  const selectedServer = useSelector(
-    (state: RootState) => state.plex?.selectedServer
-  );
-  const serverOptions = useSelector(
-    (state: RootState) => state.plex?.serverOptions
-  );
+  const selectedServer = useSelector(selectedServerSelector);
+  const serverOptions = useSelector((state: RootState) => state.plex?.servers);
   const libraries = useSelector((state: RootState) => state.plex.libraries);
 
   useEffect(() => {
@@ -49,6 +51,11 @@ const HomePage: React.FC = () => {
 
   const handleServerSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
     dispatch(selectServer(event.target.value as string));
+  };
+
+  const handleChipToggle = (lib: Library, selected: boolean) => {
+    console.log(lib.title, selected);
+    dispatch(toggleSelectedLibrary(lib));
   };
 
   return (
@@ -87,11 +94,19 @@ const HomePage: React.FC = () => {
           <Grid
             container
             justify="center"
+            alignItems="center"
             direction="row"
             className={classes.container}
           >
             {libraries.map((lib) => {
-              return <LibraryChip key={lib.id} lib={lib} />;
+              return (
+                <LibraryChip
+                  key={lib.id}
+                  lib={lib}
+                  selected={lib.selected}
+                  onClick={handleChipToggle}
+                />
+              );
             })}
           </Grid>
         </>

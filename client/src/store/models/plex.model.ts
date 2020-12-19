@@ -3,6 +3,7 @@ export interface Server {
   ip: string;
   id: string;
   device: string;
+  selected: boolean;
 }
 
 export interface PlexAccountUser {
@@ -18,6 +19,7 @@ export interface Library {
   title: string;
   id: string;
   type: LibraryType;
+  selected: boolean;
 }
 
 export interface PinResponse {
