@@ -56,8 +56,8 @@ def get_servers(account: MyPlexAccount = Depends(get_plex_account)):
     return servers
 
 
-@router.get("/api/libraries", response_model=List[str])
-def get_libraries(plex: PlexServer = Depends(get_plex_server)) -> List[str]:
-    print([vars(section) for section in plex.library.sections()])
+@router.get("/api/libraries")
+def get_libraries(plex: PlexServer = Depends(get_plex_server)) -> List[Any]:
+    [pprint(vars(section)) for section in plex.library.sections()]
     # 'type' can be show, artist, movie
-    return [section.title for section in plex.library.sections()]
+    return [{'title': section.title, 'type': section.type, 'id': section.uuid } for section in plex.library.sections()]

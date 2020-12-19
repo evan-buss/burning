@@ -12,7 +12,12 @@ class Credentials:
     client_id: str
     server_ip: Optional[str] = None
 
-    def __init__(self, x_plex_token: str = Header(...), x_client_id=Header(...)):
+    def __init__(
+        self,
+        x_plex_token: str = Header(...),
+        x_client_id=Header(...),
+        x_server_ip=Header(...),
+    ):
         if x_plex_token is None:
             raise HTTPException(status_code=401, detail="x-client-id header missing.")
 
@@ -21,6 +26,7 @@ class Credentials:
 
         self.plex_token = x_plex_token
         self.client_id = x_client_id
+        self.server_ip = x_server_ip
 
 
 def get_plex_account(

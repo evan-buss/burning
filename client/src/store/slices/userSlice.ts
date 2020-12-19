@@ -12,19 +12,15 @@ import {
   getPin,
   getTokenFromPin,
   isTokenValid,
-} from "../../services/auth";
+} from "../../services/auth.service";
 import { loadState, saveState } from "../../services/utils";
+import { PinResponse } from "../models/plex.model";
 import { AppThunk, RootState } from "../store";
 
 export interface UserState {
   clientId: string;
   accessToken?: string;
   pins?: PinResponse;
-}
-
-export interface PinResponse {
-  id?: string;
-  code?: string;
 }
 
 const initialState: UserState = {
@@ -49,7 +45,7 @@ const userSlice = createSlice({
   },
 });
 
-export const saveUserState = (store: Store<RootState>) => {
+export const persistUserState = (store: Store<RootState>) =>
   store.subscribe(
     throttle(() => {
       saveState("accessToken", store.getState().user.accessToken);
@@ -58,7 +54,9 @@ export const saveUserState = (store: Store<RootState>) => {
       saveState("pinCode", store.getState().user.pins?.code, true);
     }, 1000)
   );
-};
+
+const { setAccessToken, setPins } = userSlice.actions;
+export default userSlice.reducer;
 
 export const authLinkSelector = createSelector(
   (state: RootState) => state.user,
@@ -87,7 +85,3 @@ export const tokenToPin = (): AppThunk => async (dispatch, getStore) => {
   );
   dispatch(setAccessToken(token));
 };
-
-const { setAccessToken, setPins } = userSlice.actions;
-
-export default userSlice.reducer;

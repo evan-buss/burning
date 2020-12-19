@@ -1,5 +1,6 @@
+import axios from "axios";
 import qs from "qs";
-import { PinResponse } from "../store/slices/userSlice";
+import { PinResponse } from "../store/models/plex.model";
 
 /**
  * @see https://forums.plex.tv/t/authenticating-with-plex/609370
@@ -21,8 +22,7 @@ const headers: Record<string, string> = {
  * @param clientId The unique identifier for the user's device.
  */
 export async function getPin(clientId: string): Promise<PinResponse> {
-  const res = await fetch("https://plex.tv/api/v2/pins", {
-    method: "POST",
+  const res = await axios.post("https://plex.tv/api/v2/pins", {
     headers: {
       strong: "true",
       "X-Plex-Client-Identifier": clientId,
@@ -30,9 +30,7 @@ export async function getPin(clientId: string): Promise<PinResponse> {
     },
   });
 
-  const json = await res.json();
-
-  return { id: json.id, code: json.code } as PinResponse;
+  return { id: res.data.id, code: res.data.code } as PinResponse;
 }
 
 // curl - X GET 'https://plex.tv/api/v2/pins/<pinID>' \
@@ -53,7 +51,7 @@ export async function getTokenFromPin(
   pinId: string,
   pinCode: string
 ): Promise<string> {
-  const res = await fetch(`https://plex.tv/api/v2/pins/${pinId}`, {
+  const res = await axios.get(`https://plex.tv/api/v2/pins/${pinId}`, {
     headers: {
       code: pinCode,
       "X-Plex-Client-Identifier": clientId,
@@ -62,12 +60,11 @@ export async function getTokenFromPin(
   });
 
   if (res.status === 200) {
-    const json = await res.json();
-    console.log(json);
-    if (json.authToken === null) {
+    console.log(res.data);
+    if (res.data.authToken === null) {
       return Promise.reject("AuthToken is null");
     }
-    return json.authToken;
+    return res.data.authToken;
   }
   return Promise.reject("Error getting access token");
 }
@@ -85,7 +82,7 @@ export async function isTokenValid(clientId: string, accessToken: string) {
   // -d 'X-Plex-Client-Identifier=<clientIdentifier>' \
   // -d 'X-Plex-Token=<userToken>'
 
-  const res = await fetch("https://plex.tv/api/v2/user", {
+  const res = await axios.get("https://plex.tv/api/v2/user", {
     headers: {
       strong: "true",
       "X-Plex-Client-Identifier": clientId,

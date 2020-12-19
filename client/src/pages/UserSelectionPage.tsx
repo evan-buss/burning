@@ -11,8 +11,10 @@ import {
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { getUsers, PlexAccountUser } from "../services/users";
+import { getUsers } from "../store/slices/plexSlice";
+import { AppDispatch, RootState } from "../store/store";
 
 const useStyles = makeStyles({
   avatarCard: {
@@ -41,18 +43,16 @@ const useStyles = makeStyles({
 });
 
 const UserSelectionPage: React.FC = () => {
-  const [users, setUsers] = useState<PlexAccountUser[]>([]);
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const history = useHistory();
   const classes = useStyles();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const users = useSelector((state: RootState) => state.plex.users);
+  const loading = () => users?.length === 0;
 
   useEffect(() => {
-    setLoading(true);
-    getUsers().then((users) => {
-      setUsers(users);
-      setLoading(false);
-    });
+    dispatch(getUsers());
   }, []);
 
   const handleSelect = () => {
@@ -60,7 +60,7 @@ const UserSelectionPage: React.FC = () => {
     history.push("/dashboard");
   };
 
-  if (loading) {
+  if (loading()) {
     return (
       <Grid
         style={{ height: "100%" }}

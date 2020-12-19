@@ -11,8 +11,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LibraryChip } from "../components/LibraryChip";
-import { getLibraries } from "../services/plex";
-import { getServers, selectServer, Server } from "../store/slices/plexSlice";
+import { getServers, selectServer } from "../store/slices/plexSlice";
 import { AppDispatch, RootState } from "../store/store";
 
 const useStyles = makeStyles({
@@ -34,7 +33,6 @@ const useStyles = makeStyles({
 
 const HomePage: React.FC = () => {
   const classes = useStyles();
-  const [libraries, setLibraries] = useState<string[]>([]);
 
   const dispatch = useDispatch<AppDispatch>();
   const selectedServer = useSelector(
@@ -43,15 +41,14 @@ const HomePage: React.FC = () => {
   const serverOptions = useSelector(
     (state: RootState) => state.plex?.serverOptions
   );
+  const libraries = useSelector((state: RootState) => state.plex.libraries);
 
   useEffect(() => {
     dispatch(getServers());
-  }, []);
+  }, [dispatch]);
 
   const handleServerSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
-    console.log(event);
     dispatch(selectServer(event.target.value as string));
-    // getLibraries().then((res) => setLibraries(res));
   };
 
   return (
@@ -68,7 +65,7 @@ const HomePage: React.FC = () => {
             labelId="server-select"
             id="server-select"
             // value={selectedServer?.id}
-            // onChange={handleServerSelect}
+            onChange={handleServerSelect}
           >
             {serverOptions &&
               serverOptions?.map((server) => {
@@ -94,7 +91,7 @@ const HomePage: React.FC = () => {
             className={classes.container}
           >
             {libraries.map((lib) => {
-              return <LibraryChip key={lib} label={lib} />;
+              return <LibraryChip key={lib.id} lib={lib} />;
             })}
           </Grid>
         </>
