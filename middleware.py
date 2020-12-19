@@ -1,6 +1,6 @@
 import time
 
-from fastapi import HTTPException, Header, Request, Response
+from fastapi import Request, Response
 
 
 async def logging_middleware(request: Request, call_next):

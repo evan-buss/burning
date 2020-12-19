@@ -1,4 +1,3 @@
-from os import sep
 from typing import List, Optional, Any
 from pprint import pprint
 from dataclasses import dataclass
@@ -40,14 +39,14 @@ class Server:
         self.ip = next(ip for ip in device.connections if device.publicAddress in ip)
 
 
-@router.get("/api/users", response_model=List[PlexAccountUser])
+@router.get("/users", response_model=List[PlexAccountUser])
 def get_users(
     account: MyPlexAccount = Depends(get_plex_account),
 ) -> List[PlexAccountUser]:
     return [PlexAccountUser.parse(plex_user) for plex_user in account.users()]
 
 
-@router.get("/api/servers")
+@router.get("/servers")
 def get_servers(account: MyPlexAccount = Depends(get_plex_account)):
     servers = [
         Server(device) for device in account.devices() if "server" in device.provides
@@ -56,8 +55,11 @@ def get_servers(account: MyPlexAccount = Depends(get_plex_account)):
     return servers
 
 
-@router.get("/api/libraries")
+@router.get("/libraries")
 def get_libraries(plex: PlexServer = Depends(get_plex_server)) -> List[Any]:
     [pprint(vars(section)) for section in plex.library.sections()]
     # 'type' can be show, artist, movie
-    return [{'title': section.title, 'type': section.type, 'id': section.uuid } for section in plex.library.sections()]
+    return [
+        {"title": section.title, "type": section.type, "id": section.uuid}
+        for section in plex.library.sections()
+    ]

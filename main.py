@@ -6,9 +6,7 @@ from api import router
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000"
-]
+origins = ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,6 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router)
+app.include_router(router, prefix="/api")
 
 app.mount("/", StaticFiles(directory="client/build/", html=True), name="client")
