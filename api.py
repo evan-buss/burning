@@ -1,7 +1,10 @@
+from os import sep
 from typing import List, Optional, Any
+from pprint import pprint
+from dataclasses import dataclass
 
 from fastapi import APIRouter, Depends
-from plexapi.myplex import MyPlexUser, MyPlexAccount
+from plexapi.myplex import MyPlexDevice, MyPlexUser, MyPlexAccount
 from plexapi.server import PlexServer
 from pydantic.main import BaseModel
 
@@ -23,9 +26,18 @@ class PlexAccountUser(BaseModel):
         )
 
 
-class Server(BaseModel):
+@dataclass
+class Server:
     name: str
     ip: str
+    id: str
+    device: str
+
+    def __init__(self, device: MyPlexDevice):
+        self.name = device.name
+        self.id = device.id
+        self.device = device.device
+        self.ip = next(ip for ip in device.connections if device.publicAddress in ip)
 
 
 @router.get("/api/users", response_model=List[PlexAccountUser])
@@ -35,9 +47,13 @@ def get_users(
     return [PlexAccountUser.parse(plex_user) for plex_user in account.users()]
 
 
-@router.get("/api/servers", response_model=List[Server])
-def get_servers():
-    return [Server(name="Evan's Server", ip="http://192.168.1.222:32400")]
+@router.get("/api/servers")
+def get_servers(account: MyPlexAccount = Depends(get_plex_account)):
+    servers = [
+        Server(device) for device in account.devices() if "server" in device.provides
+    ]
+    pprint(servers)
+    return servers
 
 
 @router.get("/api/libraries", response_model=List[str])

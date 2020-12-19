@@ -1,13 +1,23 @@
-import { AppBar, CssBaseline, Toolbar, Typography, useMediaQuery } from "@material-ui/core";
-import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
-import React, { useMemo } from 'react';
+import {
+  AppBar,
+  CssBaseline,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+} from "@material-ui/core";
+import {
+  createMuiTheme,
+  makeStyles,
+  ThemeProvider,
+} from "@material-ui/core/styles";
+import React, { useMemo } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { BottomNavBar } from "./components/BottomNavBar";
 import FireLogo from "./components/FireLogo";
-import DashboardPage from "./pages/Dashboard";
+import HomePage from "./pages/HomePage";
 import HistoryPage from "./pages/HistoryPage";
-import LandingPage from "./pages/Landing";
-import LoginPage from "./pages/Login";
+import UserSelectionPage from "./pages/UserSelectionPage";
+import LoginPage from "./pages/LoginPage";
 
 const useStyles = makeStyles({
   logo: {
@@ -19,13 +29,13 @@ const useStyles = makeStyles({
     height: "100vh",
   },
   content: {
-    height: "100%"
-  }
+    height: "100%",
+  },
 });
 
 function App() {
   const classes = useStyles();
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
   const theme = useMemo(
     () =>
@@ -34,10 +44,10 @@ function App() {
           primary: {
             main: "#E5A00D",
           },
-          type: prefersDarkMode ? 'dark' : 'light',
+          type: prefersDarkMode ? "dark" : "light",
         },
       }),
-    [prefersDarkMode],
+    [prefersDarkMode]
   );
 
   return (
@@ -48,16 +58,27 @@ function App() {
           <AppBar position="static" color="inherit">
             <Toolbar>
               <FireLogo className={classes.logo} />
-              <Typography variant="h6" color="textPrimary">Burning</Typography>
+              <Typography variant="h6" color="textPrimary">
+                Burning
+              </Typography>
             </Toolbar>
           </AppBar>
 
+          {/* TODO: Figure out how to change the '/' path to be appropriate depending on user's login level. */}
           <div className={classes.content}>
             <Switch>
-              <Route exact path="/"><LoginPage /></Route>
-              <Route path="/home"><LandingPage /></Route>
-              <Route path="/dashboard"><DashboardPage /></Route>
-              <Route path="/history"><HistoryPage /></Route>
+              <Route exact path="/">
+                <LoginPage />
+              </Route>
+              <Route path="/home">
+                <UserSelectionPage />
+              </Route>
+              <Route path="/dashboard">
+                <HomePage />
+              </Route>
+              <Route path="/history">
+                <HistoryPage />
+              </Route>
             </Switch>
           </div>
 

@@ -42,8 +42,6 @@ def get_plex_server(
     try:
         if creds.server_ip is not None:
             return PlexServer(creds.server_ip, creds.plex_token, timeout=timeout)
-        else:
-            return PlexServer("http://192.168.1.222:32400", creds.plex_token, timeout=timeout)
 
         raise HTTPException(
             status_code=400,
