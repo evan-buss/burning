@@ -29,7 +29,7 @@ const TopNavBar: React.FC = () => {
 
   useEffect(() => {
     dispatch(getUsers());
-  }, []);
+  }, [dispatch]);
 
   return (
     <>

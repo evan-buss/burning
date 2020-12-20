@@ -11,7 +11,6 @@ import {
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LibraryChip } from "../components/LibraryChip";
-import { Library } from "../store/models/plex.model";
 import {
   getServers,
   selectedServerSelector,
@@ -51,11 +50,6 @@ const HomePage: React.FC = () => {
 
   const handleServerSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
     dispatch(selectServer(event.target.value as string));
-  };
-
-  const handleChipToggle = (lib: Library, selected: boolean) => {
-    console.log(lib.title, selected);
-    dispatch(toggleSelectedLibrary(lib));
   };
 
   return (
@@ -103,8 +97,7 @@ const HomePage: React.FC = () => {
                 <LibraryChip
                   key={lib.id}
                   lib={lib}
-                  selected={lib.selected}
-                  onClick={handleChipToggle}
+                  onClick={(lib) => dispatch(toggleSelectedLibrary(lib))}
                 />
               );
             })}

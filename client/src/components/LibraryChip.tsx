@@ -7,8 +7,7 @@ import { Library, LibraryType } from "../store/models/plex.model";
 
 type Props = {
   lib: Library;
-  selected?: boolean;
-  onClick: (lib: Library, selected: boolean) => void;
+  onClick: (lib: Library) => void;
 };
 
 const useStyles = makeStyles({
@@ -19,9 +18,10 @@ const useStyles = makeStyles({
 
 export const LibraryChip: React.FC<Props> = (props) => {
   const classes = useStyles();
+  const { lib, onClick } = props;
 
   const handleClick = () => {
-    props.onClick(props.lib, props.lib.selected);
+    onClick(lib);
   };
 
   const getIcon = (type: LibraryType) => {
@@ -38,10 +38,10 @@ export const LibraryChip: React.FC<Props> = (props) => {
   return (
     <Chip
       color="primary"
-      icon={getIcon(props.lib.type)}
+      icon={getIcon(lib.type)}
       className={classes.chip}
-      label={props.lib.title}
-      variant={props.lib.selected ? "default" : "outlined"}
+      label={lib.title}
+      variant={lib.selected ? "default" : "outlined"}
       onClick={handleClick}
     />
   );

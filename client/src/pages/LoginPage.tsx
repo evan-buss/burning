@@ -48,7 +48,6 @@ const LoginPage: React.FC = () => {
         }
       });
     } else if (user.accessToken) {
-      console.log("has accesstoken handler");
       dispatch(checkTokenValidity()).then((result) => {
         if (checkTokenValidity.fulfilled.match(result)) {
           const isValid = result.payload;
@@ -60,7 +59,6 @@ const LoginPage: React.FC = () => {
         }
       });
     } else {
-      console.log("no accesstoken handler");
       dispatch(fetchPins());
     }
   }, []);

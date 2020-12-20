@@ -54,7 +54,7 @@ const userSlice = createSlice({
 export const persistUserState = (store: Store<RootState>) => {
   store.subscribe(
     throttle(() => {
-      console.log("saving");
+      // TODO: Find out how to subscribe to specific reducer state.
       saveState("accessToken", store.getState().user.accessToken);
       saveState("clientId", store.getState().user.clientId);
       saveState("pinId", store.getState().user.pins?.id, true);
