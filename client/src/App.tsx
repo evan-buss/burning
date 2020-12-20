@@ -1,10 +1,4 @@
-import {
-  AppBar,
-  CssBaseline,
-  Toolbar,
-  Typography,
-  useMediaQuery,
-} from "@material-ui/core";
+import { CssBaseline, useMediaQuery } from "@material-ui/core";
 import {
   createMuiTheme,
   makeStyles,
@@ -13,17 +7,14 @@ import {
 import React, { useMemo } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { BottomNavBar } from "./components/BottomNavBar";
-import FireLogo from "./components/FireLogo";
-import HomePage from "./pages/HomePage";
-import HistoryPage from "./pages/HistoryPage";
-import UserSelectionPage from "./pages/UserSelectionPage";
-import LoginPage from "./pages/LoginPage";
 import PrivateRoute from "./components/PrivateRoute";
+import TopNavBar from "./components/TopNavBar";
+import HistoryPage from "./pages/HistoryPage";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import UserSelectionPage from "./pages/UserSelectionPage";
 
 const useStyles = makeStyles({
-  logo: {
-    marginRight: 8,
-  },
   container: {
     display: "flex",
     flexFlow: "column nowrap",
@@ -37,7 +28,6 @@ const useStyles = makeStyles({
 function App() {
   const classes = useStyles();
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-
   const theme = useMemo(
     () =>
       createMuiTheme({
@@ -56,16 +46,7 @@ function App() {
       <CssBaseline />
       <Router>
         <div className={classes.container}>
-          <AppBar position="static" color="inherit">
-            <Toolbar>
-              <FireLogo className={classes.logo} />
-              <Typography variant="h6" color="textPrimary">
-                Burning
-              </Typography>
-            </Toolbar>
-          </AppBar>
-
-          {/* TODO: Figure out how to change the '/' path to be appropriate depending on user's login level. */}
+          <TopNavBar />
           <div className={classes.content}>
             <Switch>
               <Route path="/login">
@@ -87,7 +68,6 @@ function App() {
               </Route>
             </Switch>
           </div>
-
           <BottomNavBar />
         </div>
       </Router>
