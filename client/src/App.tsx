@@ -18,6 +18,7 @@ import HomePage from "./pages/HomePage";
 import HistoryPage from "./pages/HistoryPage";
 import UserSelectionPage from "./pages/UserSelectionPage";
 import LoginPage from "./pages/LoginPage";
+import PrivateRoute from "./components/PrivateRoute";
 
 const useStyles = makeStyles({
   logo: {
@@ -67,17 +68,22 @@ function App() {
           {/* TODO: Figure out how to change the '/' path to be appropriate depending on user's login level. */}
           <div className={classes.content}>
             <Switch>
-              <Route exact path="/">
+              <Route path="/login">
                 <LoginPage />
               </Route>
-              <Route path="/home">
-                <UserSelectionPage />
-              </Route>
-              <Route path="/dashboard">
+              <PrivateRoute exact path="/">
                 <HomePage />
-              </Route>
-              <Route path="/history">
+              </PrivateRoute>
+              <PrivateRoute path="/users">
+                <UserSelectionPage />
+              </PrivateRoute>
+              <PrivateRoute path="/history">
                 <HistoryPage />
+              </PrivateRoute>
+              <Route path="*">
+                <PrivateRoute path="/">
+                  <HomePage />
+                </PrivateRoute>
               </Route>
             </Switch>
           </div>

@@ -22,7 +22,7 @@ const headers: Record<string, string> = {
  * @param clientId The unique identifier for the user's device.
  */
 export async function getPin(clientId: string): Promise<PinResponse> {
-  const res = await axios.post("https://plex.tv/api/v2/pins", {
+  const res = await axios.post("https://plex.tv/api/v2/pins", null, {
     headers: {
       strong: "true",
       "X-Plex-Client-Identifier": clientId,
@@ -86,7 +86,7 @@ export async function isTokenValid(clientId: string, accessToken: string) {
     headers: {
       strong: "true",
       "X-Plex-Client-Identifier": clientId,
-      "X-Plex-Token": accessToken,
+      // "X-Plex-Token": accessToken,
       ...headers,
     },
   });
@@ -112,7 +112,7 @@ export function getAuthURL(clientId: string, pinCode?: string): string | null {
     qs.stringify({
       clientID: clientId,
       code: pinCode,
-      forwardUrl: "http://localhost:3000/?postback=true",
+      forwardUrl: "http://localhost:3000/login?postback=true",
       context: {
         device: {
           product: "Plex Web",

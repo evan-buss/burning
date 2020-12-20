@@ -42,13 +42,14 @@ const LoginPage: React.FC = () => {
   useEffect(() => {
     // User logged in. Get their access token.
     if (query.has("postback")) {
-      dispatch(tokenToPin());
-      history.push("/home");
-      return;
-    }
-
-    if (user.accessToken) {
-      dispatch(checkTokenValidity()).then(async (result) => {
+      dispatch(tokenToPin()).then((result) => {
+        if (tokenToPin.fulfilled.match(result)) {
+          history.push("/home");
+        }
+      });
+    } else if (user.accessToken) {
+      console.log("has accesstoken handler");
+      dispatch(checkTokenValidity()).then((result) => {
         if (checkTokenValidity.fulfilled.match(result)) {
           const isValid = result.payload;
           if (isValid) {
@@ -59,9 +60,10 @@ const LoginPage: React.FC = () => {
         }
       });
     } else {
+      console.log("no accesstoken handler");
       dispatch(fetchPins());
     }
-  }, [dispatch, history, query, user.accessToken]);
+  }, []);
 
   return (
     <Grid
