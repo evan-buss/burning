@@ -1,7 +1,8 @@
 import { BottomNavigation, BottomNavigationAction } from "@material-ui/core";
-import { Dashboard } from "@material-ui/icons";
+
+import HomeIcon from "@material-ui/icons/Home";
 import FavoriteIcon from "@material-ui/icons/Favorite";
-import RestoreIcon from "@material-ui/icons/Restore";
+
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 
@@ -21,16 +22,16 @@ export const BottomNavBar = () => {
 
   return (
     <BottomNavigation onChange={handleChange} value={value} showLabels>
-      <BottomNavigationAction label="Home" value="/" icon={<FavoriteIcon />} />
-      <BottomNavigationAction
+      <BottomNavigationAction label="Home" value="/" icon={<HomeIcon />} />
+      {/* <BottomNavigationAction
         label="Dashboard"
         value="/users"
         icon={<Dashboard />}
-      />
+      /> */}
       <BottomNavigationAction
         label="History"
         value="/history"
-        icon={<RestoreIcon />}
+        icon={<FavoriteIcon />}
       />
     </BottomNavigation>
   );

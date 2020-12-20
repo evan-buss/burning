@@ -1,15 +1,15 @@
 import {
   AppBar,
+  Avatar,
   IconButton,
   makeStyles,
   Toolbar,
   Typography,
 } from "@material-ui/core";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { getUsers } from "../store/slices/plexSlice";
-import { AppDispatch } from "../store/store";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 import FireLogo from "./FireLogo";
 import UserDialog from "./UserDialog";
 
@@ -20,16 +20,18 @@ const useStyles = makeStyles({
   grow: {
     flexGrow: 1,
   },
+  avatarImage: {
+    height: "1.2em",
+    width: "1.2em",
+  },
 });
 
 const TopNavBar: React.FC = () => {
   const classes = useStyles();
-  const dispatch = useDispatch<AppDispatch>();
+  const selectedUser = useSelector((state: RootState) =>
+    state.plex.users.find((x) => x.selected)
+  );
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    dispatch(getUsers());
-  }, [dispatch]);
 
   return (
     <>
@@ -39,13 +41,26 @@ const TopNavBar: React.FC = () => {
           <Typography variant="h6" color="textPrimary" className={classes.grow}>
             Burning
           </Typography>
+
           <IconButton onClick={() => setOpen(true)}>
-            <AccountCircleIcon />
+            {selectedUser ? (
+              <Avatar
+                className={classes.avatarImage}
+                alt={selectedUser.name}
+                src={selectedUser.thumbnail}
+              />
+            ) : (
+              <AccountCircleIcon />
+            )}
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      <UserDialog open={open} onClose={() => setOpen(false)} />
+      <UserDialog
+        open={open}
+        selectedValue={selectedUser}
+        onClose={() => setOpen(false)}
+      />
     </>
   );
 };

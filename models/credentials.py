@@ -1,7 +1,7 @@
 from typing import Optional
 
 import requests
-from fastapi import Header, HTTPException, Depends
+from fastapi import Depends, Header, HTTPException
 from plexapi.exceptions import Unauthorized
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer

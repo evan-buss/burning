@@ -7,7 +7,7 @@ import {
   checkTokenValidity,
   fetchPins,
   tokenToPin,
-} from "../store/slices/userSlice";
+} from "../store/slices/authSlice";
 import { AppDispatch, RootState } from "../store/store";
 
 // A custom hook that builds on useLocation to parse
@@ -29,7 +29,7 @@ const LoginPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
 
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => state.auth);
   const authLink = useSelector(authLinkSelector);
   const dispatch = useDispatch<AppDispatch>();
 

@@ -1,7 +1,7 @@
 import React, { ReactFragment } from "react";
 import { useSelector } from "react-redux";
 import { Redirect, Route } from "react-router";
-import { isAuthenticatedSelector } from "../store/slices/userSlice";
+import { isAuthenticatedSelector } from "../store/slices/authSlice";
 
 interface Props {
   children: ReactFragment;

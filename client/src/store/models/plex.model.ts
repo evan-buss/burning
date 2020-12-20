@@ -11,6 +11,7 @@ export interface PlexAccountUser {
   name: string;
   thumbnail: string;
   email?: string;
+  selected: boolean;
 }
 
 export type LibraryType = "movie" | "show" | "artist";

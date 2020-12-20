@@ -10,23 +10,30 @@ import {
 } from "@material-ui/core";
 import { ExitToApp } from "@material-ui/icons";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { PlexAccountUser } from "../store/models/plex.model";
-import { RootState } from "../store/store";
+import { setSelectedUser } from "../store/slices/plexSlice";
+import { AppDispatch, RootState } from "../store/store";
 
 export interface Props {
   open: boolean;
   selectedValue?: PlexAccountUser;
-  onClose: (value: string) => void;
+  onClose: () => void;
 }
 
 const UserDialog: React.FC<Props> = (props) => {
   const users = useSelector((state: RootState) => state.plex.users);
   const { open, selectedValue, onClose } = props;
+  const dispatch = useDispatch<AppDispatch>();
+
+  const handleUserSelect = (user?: PlexAccountUser) => {
+    dispatch(setSelectedUser(user));
+    onClose();
+  };
 
   return (
     <Dialog
-      onClose={() => onClose("WOWEE")}
+      onClose={onClose}
       aria-labelledby="user-dialog-title"
       open={open}
       fullWidth={true}
@@ -36,6 +43,7 @@ const UserDialog: React.FC<Props> = (props) => {
       <List>
         {users.map((user) => (
           <ListItem
+            onClick={() => handleUserSelect(user)}
             selected={user.id === selectedValue?.id}
             button
             key={user.id}
@@ -48,10 +56,7 @@ const UserDialog: React.FC<Props> = (props) => {
         ))}
 
         <Divider />
-        <ListItem
-          button
-          //   onClick={() => logOut()}
-        >
+        <ListItem button onClick={() => handleUserSelect(undefined)}>
           <ListItemAvatar>
             <Avatar>
               <ExitToApp color="action" />

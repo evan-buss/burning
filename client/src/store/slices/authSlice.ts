@@ -16,6 +16,7 @@ import {
 import { loadState, saveState } from "../../services/utils";
 import { PinResponse } from "../models/plex.model";
 import { AppThunk, RootState } from "../store";
+import { getUsers } from "./plexSlice";
 
 export interface UserState {
   tokenValid: boolean;
@@ -34,7 +35,7 @@ const initialState: UserState = {
   },
 };
 
-const userSlice = createSlice({
+const authSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
@@ -55,39 +56,40 @@ export const persistUserState = (store: Store<RootState>) => {
   store.subscribe(
     throttle(() => {
       // TODO: Find out how to subscribe to specific reducer state.
-      saveState("accessToken", store.getState().user.accessToken);
-      saveState("clientId", store.getState().user.clientId);
-      saveState("pinId", store.getState().user.pins?.id, true);
-      saveState("pinCode", store.getState().user.pins?.code, true);
+      saveState("accessToken", store.getState().auth.accessToken);
+      saveState("clientId", store.getState().auth.clientId);
+      saveState("pinId", store.getState().auth.pins?.id, true);
+      saveState("pinCode", store.getState().auth.pins?.code, true);
     }, 1000)
   );
 };
 
-const { setAccessToken, setPins } = userSlice.actions;
-export default userSlice.reducer;
+const { setAccessToken, setPins } = authSlice.actions;
+export default authSlice.reducer;
 
 export const isAuthenticatedSelector = createSelector(
-  (state: RootState) => state.user,
+  (state: RootState) => state.auth,
   (user) => user.accessToken && user.tokenValid
 );
 
 export const authLinkSelector = createSelector(
-  (state: RootState) => state.user,
+  (state: RootState) => state.auth,
   (user) => getAuthURL(user.clientId, user.pins?.code)
 );
 
 export const checkTokenValidity = createAsyncThunk(
   "user/getTokenFromPin",
   async (_, thunkAPI): Promise<boolean> => {
-    const user = (thunkAPI.getState() as RootState).user as UserState;
+    const user = (thunkAPI.getState() as RootState).auth as UserState;
     const valid = await isTokenValid(user.clientId, user.accessToken!);
-    thunkAPI.dispatch(userSlice.actions.setValid(valid));
+    thunkAPI.dispatch(authSlice.actions.setValid(valid));
+    if (valid) thunkAPI.dispatch(getUsers());
     return valid;
   }
 );
 
 export const fetchPins = (): AppThunk => async (dispatch, getStore) => {
-  const clientId = getStore().user.clientId;
+  const clientId = getStore().auth.clientId;
   const pins = await getPin(clientId);
   dispatch(setPins(pins));
 };
@@ -95,12 +97,14 @@ export const fetchPins = (): AppThunk => async (dispatch, getStore) => {
 export const tokenToPin = createAsyncThunk(
   "user/tokenToPin",
   async (_, thunkAPI) => {
-    const state = (thunkAPI.getState() as RootState).user;
+    const state = (thunkAPI.getState() as RootState).auth;
     const token = await getTokenFromPin(
       state.clientId,
       state.pins?.id!,
       state.pins?.code!
     );
+    // Set the access token
     thunkAPI.dispatch(setAccessToken(token));
+    thunkAPI.dispatch(getUsers());
   }
 );

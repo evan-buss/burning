@@ -41,6 +41,9 @@ const HomePage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const selectedServer = useSelector(selectedServerSelector);
+  const selectedUser = useSelector((state: RootState) =>
+    state.plex.users.find((x) => x.selected)
+  );
   const serverOptions = useSelector((state: RootState) => state.plex?.servers);
   const libraries = useSelector((state: RootState) => state.plex.libraries);
 
@@ -115,6 +118,7 @@ const HomePage: React.FC = () => {
           className={classes.plexButton}
           variant="contained"
           color="primary"
+          disabled={!selectedUser}
         >
           Start Swiping
         </Button>

@@ -12,7 +12,6 @@ import TopNavBar from "./components/TopNavBar";
 import HistoryPage from "./pages/HistoryPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
-import UserSelectionPage from "./pages/UserSelectionPage";
 
 const useStyles = makeStyles({
   container: {
@@ -54,9 +53,6 @@ function App() {
               </Route>
               <PrivateRoute exact path="/">
                 <HomePage />
-              </PrivateRoute>
-              <PrivateRoute path="/users">
-                <UserSelectionPage />
               </PrivateRoute>
               <PrivateRoute path="/history">
                 <HistoryPage />

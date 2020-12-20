@@ -1,12 +1,12 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import axios, { AxiosRequestConfig } from "axios";
 import plexReducer, { selectedServerSelector } from "./slices/plexSlice";
-import userReducer, { persistUserState } from "./slices/userSlice";
+import authReducer, { persistUserState } from "./slices/authSlice";
 
 export const store = configureStore({
   reducer: {
     plex: plexReducer,
-    user: userReducer,
+    auth: authReducer,
   },
 });
 
@@ -15,8 +15,8 @@ axios.defaults.timeout = 10_000;
 axios.interceptors.request.use((config: AxiosRequestConfig) => {
   config.headers = {
     ...config.headers,
-    "x-plex-token": store.getState().user.accessToken,
-    "x-client-id": store.getState().user.clientId,
+    "x-plex-token": store.getState().auth.accessToken,
+    "x-client-id": store.getState().auth.clientId,
     "x-server-ip": selectedServerSelector(store.getState())?.ip,
   };
   return config;
