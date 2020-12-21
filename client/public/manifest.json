@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Burning for Plex",
+  "name": "Match movies with Plex users.",
   "icons": [
     {
       "src": "favicon.ico",
