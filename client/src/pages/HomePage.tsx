@@ -18,6 +18,7 @@ import {
   toggleSelectedLibrary,
 } from "../store/slices/plexSlice";
 import { AppDispatch, RootState } from "../store/store";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles({
   heading: {
@@ -115,6 +116,8 @@ const HomePage: React.FC = () => {
         className={classes.buttonContainer}
       >
         <Button
+          component={Link}
+          to="/swipe"
           className={classes.plexButton}
           variant="contained"
           color="primary"

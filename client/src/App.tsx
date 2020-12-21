@@ -12,6 +12,7 @@ import TopNavBar from "./components/TopNavBar";
 import HistoryPage from "./pages/HistoryPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
+import SwipePage from "./pages/SwipePage";
 
 const useStyles = makeStyles({
   container: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles({
     height: "100vh",
   },
   content: {
-    height: "100%",
+    height: "calc(100% - 11px)",
   },
 });
 
@@ -53,6 +54,9 @@ function App() {
               </Route>
               <PrivateRoute exact path="/">
                 <HomePage />
+              </PrivateRoute>
+              <PrivateRoute path="/swipe">
+                <SwipePage />
               </PrivateRoute>
               <PrivateRoute path="/history">
                 <HistoryPage />

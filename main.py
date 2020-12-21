@@ -3,6 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from api import router
+from database import schema
+from database.database import engine
+
+schema.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
