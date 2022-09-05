@@ -1,0 +1,10 @@
+html,
+body,
+body > div:first-child,
+div#__next {
+  height: 100%;
+}
+
+div#__next > div {
+  height: calc(100% - 84px);
+}
