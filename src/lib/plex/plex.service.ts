@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useQuery } from "react-query";
-import { useAuthState } from "../state/auth.store";
+import { useAuthState } from "../../state/auth.store";
 import {
   AccountInfo,
   MediaContainer,
@@ -27,10 +27,10 @@ export function useGetHomeUsers(enabled: boolean) {
   const clientId = useAuthState((state) => state.clientId);
 
   return useQuery(
-    ["plex-home-users"],
+    ["plex", "home-users"],
     () => getHomeUsers(accessToken, clientId),
     {
-      enabled,
+      enabled: enabled && !!accessToken,
     }
   );
 }
@@ -49,11 +49,13 @@ export async function getUserInfo(
   return data;
 }
 
-export function useGetUserInfo() {
+export function useGetUserInfo(enabled = true) {
   const accessToken = useAuthState((state) => state.accessToken!);
   const clientId = useAuthState((state) => state.clientId);
 
-  return useQuery(["plex-user"], () => getUserInfo(accessToken, clientId));
+  return useQuery(["plex", "user"], () => getUserInfo(accessToken, clientId), {
+    enabled,
+  });
 }
 
 export async function getResources(
@@ -93,7 +95,7 @@ export async function getResources(
     );
 
     console.log("prioritized server:", connection.uri);
-    server.connectionUrl = connection.uri;
+    server.preferredConnection = connection.uri;
   }
 
   return data;
@@ -103,10 +105,8 @@ export function useGetResources() {
   const accessToken = useAuthState((state) => state.accessToken!);
   const clientId = useAuthState((state) => state.clientId);
 
-  console.log(accessToken, clientId);
-
   return useQuery(
-    ["plex-resources"],
+    ["plex", "resources"],
     () => getResources(accessToken, clientId),
     {
       staleTime: 1_000 * 60 * 5,
@@ -127,16 +127,67 @@ export async function getServerLibraries(
     },
   });
 
-  return data.MediaContainer;
+  const container = data.MediaContainer as MediaContainer;
+
+  // Store the token / URL so it's easily accessible.
+  for (const directory of container.Directory) {
+    directory.accessToken = accessToken;
+    directory.connection = serverAddress;
+  }
+
+  return container;
 }
 
 export function useGetServerLibraries(
   serverAddress: string,
-  accessToken: string
+  accessToken: string,
+  onSuccess?: (data: MediaContainer) => void
 ) {
   const clientId = useAuthState((state) => state.clientId);
 
-  return useQuery(["plex-libraries", serverAddress], () =>
-    getServerLibraries(serverAddress, accessToken, clientId)
+  return useQuery(
+    ["plex, libraries", serverAddress],
+    () => getServerLibraries(serverAddress, accessToken, clientId),
+    {
+      onSuccess,
+    }
+  );
+}
+
+export async function getLibrary(
+  serverAddress: string,
+  accessToken: string,
+  clientId: string,
+  libraryKey: string
+): Promise<MediaContainer> {
+  const { data } = await axios.get(
+    `${serverAddress}/library/sections/${libraryKey}/all`,
+    {
+      headers: {
+        accept: "application/json",
+        "X-Plex-Token": accessToken,
+        "X-Plex-Client-Identifier": clientId,
+      },
+      params: {
+        type: 1,
+        // ...searchParams,
+        sort: "titleSort",
+        "X-Plex-Token": accessToken,
+      },
+    }
+  );
+
+  return data.MediaContainer;
+}
+
+export async function useGetLibrary(
+  serverAddress: string,
+  accessToken: string,
+  libraryKey: string
+) {
+  const clientId = useAuthState((state) => state.clientId);
+
+  return useQuery(["plex", "libraries", serverAddress, libraryKey], () =>
+    getLibrary(serverAddress, accessToken, clientId, libraryKey)
   );
 }

@@ -1,39 +1,40 @@
 import { v4 } from "uuid";
 import create from "zustand";
-import { persist } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 
 interface AuthState {
   accessToken: string | null;
   clientId: string;
-  userId: number | null;
+  userId: string | null;
 }
 
 export const useAuthState = create<AuthState>()(
-  persist(
-    (set) => ({
-      accessToken: null,
-      clientId: v4(),
-      userId: null,
-    }),
-    {
-      name: "auth",
-      partialize: (state) => ({
-        accessToken: state.accessToken,
-        clientId: state.clientId,
-        userId: state.userId,
+  devtools(
+    persist(
+      (set) => ({
+        accessToken: null,
+        clientId: v4(),
+        userId: null,
       }),
-    }
+      {
+        name: "auth",
+        partialize: (state) => ({
+          accessToken: state.accessToken,
+          clientId: state.clientId,
+          userId: state.userId,
+        }),
+      }
+    )
   )
 );
 
 export const setAccessToken = (token: string) =>
   useAuthState.setState(() => ({ accessToken: token }));
 
-export const setUserId = (userId: number | null) =>
+export const setUserId = (userId: string | null) =>
   useAuthState.setState(() => ({ userId }));
 
 export const signOut = () =>
   useAuthState.setState(() => {
-    localStorage.removeItem("auth");
-    return { accessToken: null, userId: null, clientId: v4() };
+    return { accessToken: null, userId: null };
   });

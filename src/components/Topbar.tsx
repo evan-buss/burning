@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Burger,
   Container,
   createStyles,
   Group,
@@ -10,14 +9,14 @@ import {
   Transition,
   useMantineColorScheme,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import { NextLink } from "@mantine/next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fire, GearSix, MoonStars, SignOut, Sun } from "phosphor-react";
 import { CSSProperties } from "react";
-import { User } from "../lib/plex.model";
-import { useGetHomeUsers } from "../lib/plex.service";
+import { useQueryClient } from "react-query";
+import { User } from "../lib/plex/plex.model";
+import { useGetHomeUsers } from "../lib/plex/plex.service";
 import { signOut, useAuthState } from "../state/auth.store";
 
 const HEADER_HEIGHT = 84;
@@ -31,7 +30,6 @@ const useStyles = createStyles((theme) => ({
   },
 
   logo: {
-    padding: theme.spacing.sm,
     borderRadius: theme.radius.md,
     cursor: "pointer",
     "&:hover": {
@@ -61,16 +59,12 @@ const useStyles = createStyles((theme) => ({
 const useUser = () => {
   const userId = useAuthState((state) => state.userId);
   const { data } = useGetHomeUsers(true);
-  return data?.users.filter((user) => user.id === userId).at(0);
+  return data?.users.filter((user) => user.uuid === userId).at(0);
 };
 
 export default function Topbar() {
-  const [opened, { toggle }] = useDisclosure(false);
   const { classes } = useStyles();
-
   const user = useUser();
-
-  console.log("user", user);
 
   return (
     <Header height={HEADER_HEIGHT}>
@@ -82,16 +76,21 @@ export default function Topbar() {
           </Group>
         </Link>
 
-        <Transition transition="fade" duration={500} mounted={!!user}>
+        <Transition
+          transition="fade"
+          exitDuration={1000}
+          duration={500}
+          mounted={!!user}
+        >
           {(style) => <UserMenu user={user} style={style} />}
         </Transition>
 
-        <Burger
+        {/* <Burger
           opened={opened}
           onClick={toggle}
           className={classes.burger}
           size="sm"
-        />
+        /> */}
       </Container>
     </Header>
   );
@@ -106,9 +105,11 @@ function UserMenu({
 }) {
   const { replace } = useRouter();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const queryClient = useQueryClient();
 
   const onSignOut = () => {
     signOut();
+    queryClient.removeQueries("plex");
     replace("/");
   };
 

@@ -25,7 +25,7 @@ export interface PlexServer {
   connections: PlexServerConnection[];
 
   // custom property that contains the URI of a connection that was tested and working
-  connectionUrl: string;
+  preferredConnection: string;
 }
 
 export interface PlexServerConnection {
@@ -67,6 +67,10 @@ export interface Directory {
   contentChangedAt: number;
   hidden: number;
   Location: Location[];
+
+  // We set these after fetching for easy access.
+  accessToken: string;
+  connection: string;
 }
 
 export interface Location {

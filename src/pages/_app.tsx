@@ -13,6 +13,7 @@ import { GetServerSidePropsContext } from "next";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { useState } from "react";
+import { ReactQueryDevtools } from "react-query/devtools";
 import superjson from "superjson";
 import Topbar from "../components/Topbar";
 import type { AppRouter } from "../server/router";
@@ -66,6 +67,7 @@ export function MyApp({
           }}
         >
           <Topbar />
+          <ReactQueryDevtools initialIsOpen={true} />
           <Component {...pageProps} />
         </MantineProvider>
       </ColorSchemeProvider>
@@ -117,5 +119,5 @@ export default withTRPC<AppRouter>({
   /**
    * @link https://trpc.io/docs/ssr
    */
-  ssr: false,
+  ssr: true,
 })(MyApp);

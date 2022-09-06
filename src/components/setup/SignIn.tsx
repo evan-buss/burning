@@ -1,19 +1,28 @@
-import { Button, Card, Center, Text, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Avatar,
+  Button,
+  Card,
+  Center,
+  Group,
+  Text,
+  Title,
+  Tooltip,
+  Transition,
+} from "@mantine/core";
 import { setCookie } from "cookies-next";
 import { useRouter } from "next/router";
+import { ArrowCounterClockwise } from "phosphor-react";
 import { IPlexClientDetails, PlexOauth } from "plex-oauth";
 import { useEffect, useState } from "react";
 import { useLocalStorage } from "react-use";
+import { useGetUserInfo } from "../../lib/plex/plex.service";
+import { useCardStyles } from "../../lib/styles";
 import { setAccessToken, useAuthState } from "../../state/auth.store";
-import { useCardStyles } from "./setup-utils";
 
-interface SignInStepProps {
-  done: () => void;
-}
-
-const usePlexAuth = (done: () => void) => {
+const usePlexAuth = () => {
   const { query, replace } = useRouter();
-  const [authUrl, setAuthUrl] = useState<string | undefined>(undefined);
+  const [url, setUrl] = useState<string | undefined>(undefined);
   const [pin, setPin, removePin] = useLocalStorage<number>("pin", 123);
 
   const clientId = useAuthState((state) => state.clientId);
@@ -24,7 +33,7 @@ const usePlexAuth = (done: () => void) => {
     product: "Burning for Plex", // Name of your application
     device: "Burning for Plex", // The type of device your application is running on
     version: "1", // Version of your application
-    forwardUrl: `http://localhost:3000/setup/?postback=true`, // Optional - Url to forward back to after signing in.
+    forwardUrl: `${process.env.NEXT_PUBLIC_URL}/setup?postback=true`, // Optional - Url to forward back to after signing in.
     platform: "Web", // Optional - Platform your application runs on - Defaults to 'Web'
     urlencode: true, // Optional - If set to true, the output URL is url encoded, otherwise if not specified or 'false', the output URL will return as-is
   };
@@ -32,13 +41,6 @@ const usePlexAuth = (done: () => void) => {
   const [oauth] = useState(new PlexOauth(clientInfo));
   useEffect(() => {
     const authenticate = async () => {
-      console.log("query", query);
-
-      if (!!token) {
-        done();
-        return;
-      }
-
       if (query["postback"]) {
         console.log("postback branch");
         try {
@@ -50,7 +52,6 @@ const usePlexAuth = (done: () => void) => {
             console.log("after", token);
             setCookie("plex-token", authToken, { sameSite: "strict" });
             removePin();
-            done();
           }
         } catch (error) {
           console.error(error);
@@ -64,19 +65,21 @@ const usePlexAuth = (done: () => void) => {
 
       console.log("getting pin");
       const [link, pinId] = await oauth.requestHostedLoginURL();
-      setAuthUrl(link);
+      setUrl(link);
       setPin(pinId);
     };
 
     authenticate();
   }, [query]);
 
-  return { url: authUrl };
+  return { url, token };
 };
 
-export default function SignInStep({ done }: SignInStepProps) {
+export default function SignInStep({ done }: { done: () => void }) {
   const { classes } = useCardStyles();
-  const { url } = usePlexAuth(done);
+  const { url, token } = usePlexAuth();
+
+  const { data: account } = useGetUserInfo(!!token);
 
   return (
     <Card withBorder radius="md" p="xl" className={classes.card}>
@@ -88,18 +91,46 @@ export default function SignInStep({ done }: SignInStepProps) {
         will be redirected back. Burning never sees your Plex username or
         password.
       </Text>
-
       <Center>
-        <Button
-          component="a"
-          href={url ?? ""}
-          disabled={!url}
-          color="yellow"
-          size="md"
-        >
-          Sign In With Plex
-        </Button>
+        <Transition transition="fade" duration={1000} mounted={!!account}>
+          {(style) => (
+            <Group style={style} spacing="sm">
+              <Avatar size={40} src={account?.thumb} radius={40} />
+              <div>
+                <Text size="sm" weight={500}>
+                  {account?.username}
+                </Text>
+                <Text color="dimmed" size="xs">
+                  {account?.email}
+                </Text>
+              </div>
+              <Tooltip label="Sign In Again">
+                <ActionIcon color="yellow" size="lg" component="a" href={url}>
+                  <ArrowCounterClockwise size={24} />
+                </ActionIcon>
+              </Tooltip>
+            </Group>
+          )}
+        </Transition>
+
+        {!account && (
+          <Button
+            component="a"
+            href={url}
+            disabled={!url}
+            color="yellow"
+            size="md"
+          >
+            Sign In With Plex
+          </Button>
+        )}
       </Center>
+
+      {account && (
+        <Button mt="md" variant="outline" onClick={() => done()}>
+          Next
+        </Button>
+      )}
     </Card>
   );
 }

@@ -1,9 +1,8 @@
-import { Container, Title } from "@mantine/core";
-
 export default function Dashboard() {
-  return (
-    <Container py="xl">
-      <Title order={2}>Dashboard</Title>
-    </Container>
-  );
+  // const {data} = useGetLibrary("http://192.168.1.222", )
+  // return (
+  //   <Container py="xl">
+  //     <Title order={2}>Dashboard</Title>
+  //   </Container>
+  // );
 }

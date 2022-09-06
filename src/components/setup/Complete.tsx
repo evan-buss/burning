@@ -7,7 +7,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { Medal } from "phosphor-react";
-import { useCardStyles } from "./setup-utils";
+import { useCardStyles } from "../../lib/styles";
 
 interface CompletedStepProps {
   done: () => void;
@@ -38,7 +38,7 @@ export default function CompletedStep({ done }: CompletedStepProps) {
 
       <Center>
         <Button
-          onClick={() => done()}
+          onClick={done}
           variant="gradient"
           size="lg"
           gradient={{ from: "yellow.5", to: "yellow.8" }}

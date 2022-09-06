@@ -1,20 +1,21 @@
-import { Button, Card, Checkbox, Text, Title } from "@mantine/core";
-import { useListState } from "@mantine/hooks";
-import { useEffect } from "react";
-import { MediaContainer, PlexServer } from "../../lib/plex.model";
-import { useGetResources, useGetServerLibraries } from "../../lib/plex.service";
-import { useCardStyles } from "./setup-utils";
+import { Button, Card, Text, Title } from "@mantine/core";
+import { Directory } from "../../lib/plex/plex.model";
+import { useGetResources } from "../../lib/plex/plex.service";
+import { useCardStyles } from "../../lib/styles";
+import { LibrarySelector } from "../LibrarySelector";
 
 interface SelectLibrariesStepProps {
   done: () => void;
+  setLibraries: (library: Directory[]) => void;
 }
 
 export default function SelectLibrariesStep({
   done,
+  setLibraries,
 }: SelectLibrariesStepProps) {
   const { classes } = useCardStyles();
 
-  const { data: servers, isLoading } = useGetResources();
+  const { data: servers } = useGetResources();
 
   return (
     <Card withBorder radius="md" p="xl" className={classes.card}>
@@ -27,81 +28,17 @@ export default function SelectLibrariesStep({
         content within them.
       </Text>
 
-      {isLoading ? (
-        <h1>Loading</h1>
-      ) : (
-        servers?.map((server) => (
-          <LibrarySelection key={server.clientIdentifier} server={server} />
-        ))
-      )}
+      {servers?.map((server) => (
+        <LibrarySelector
+          setChoices={setLibraries}
+          key={server.clientIdentifier}
+          server={server}
+        />
+      ))}
 
       <Button onClick={() => done()} variant="outline" mt="md">
         Done
       </Button>
     </Card>
-  );
-}
-
-interface LibraryOption {
-  label: string;
-  checked: boolean;
-  key: string;
-}
-
-function convertMediaContainer(container: MediaContainer | undefined) {
-  return (
-    container?.Directory.map(
-      (library) =>
-        ({
-          label: library.title,
-          checked: false,
-          key: library.uuid,
-        } as LibraryOption)
-    ) ?? []
-  );
-}
-
-export function LibrarySelection({ server }: { server: PlexServer }) {
-  const [values, handlers] = useListState<LibraryOption>([]);
-  const { data } = useGetServerLibraries(
-    server.connectionUrl,
-    server.accessToken
-  );
-
-  useEffect(() => {
-    handlers.setState(convertMediaContainer(data));
-  }, [data]);
-
-  const allChecked = values.every((value) => value.checked);
-  const indeterminate = values.some((value) => value.checked) && !allChecked;
-
-  const items = values?.map((value, index) => (
-    <Checkbox
-      mt="xs"
-      ml={33}
-      label={value.label}
-      key={value.key}
-      checked={value.checked}
-      onChange={(event) =>
-        handlers.setItemProp(index, "checked", event.currentTarget.checked)
-      }
-    />
-  ));
-
-  return (
-    <>
-      <Checkbox
-        checked={allChecked}
-        indeterminate={indeterminate}
-        label={server.name}
-        transitionDuration={0}
-        onChange={() =>
-          handlers.setState((current) =>
-            current.map((value) => ({ ...value, checked: !allChecked }))
-          )
-        }
-      />
-      {items}
-    </>
   );
 }

@@ -10,6 +10,22 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Example {
-    id String @id @default(cuid())
+model User {
+    id           String   @id @default(cuid())
+    plexUUID     String   @unique
+    plexEmail    String
+    plexUsername String
+    updatedAt    DateTime @updatedAt
+
+    libraries Libraries[]
+
+    @@unique([plexEmail, plexUsername])
+}
+
+model Libraries {
+    uuid    String @id
+    address String
+    key     String
+
+    user User[]
 }

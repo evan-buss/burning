@@ -6,14 +6,13 @@ import {
   Select,
   SelectItem,
   SelectItemProps,
-  Skeleton,
   Text,
   Title,
 } from "@mantine/core";
 import { forwardRef } from "react";
-import { useGetHomeUsers, useGetUserInfo } from "../../lib/plex.service";
+import { useGetHomeUsers, useGetUserInfo } from "../../lib/plex/plex.service";
+import { useCardStyles } from "../../lib/styles";
 import { setUserId, useAuthState } from "../../state/auth.store";
-import { useCardStyles } from "./setup-utils";
 
 interface ProfileStepProps {
   done: () => void;
@@ -38,27 +37,14 @@ export default function ProfileStep({ done }: ProfileStepProps) {
         your specific profile.
       </Text>
 
-      <Skeleton visible={accountLoading} animate={true} radius="sm">
-        <Group spacing="sm">
-          <Avatar size={40} src={account?.thumb} radius={40} />
-          <div>
-            <Text size="sm" weight={500}>
-              {account?.username}
-            </Text>
-            <Text color="dimmed" size="xs">
-              {account?.email}
-            </Text>
-          </div>
-        </Group>
-      </Skeleton>
-
       {account && (
         <Select
           label="Select Profile"
           itemComponent={SelectItem}
           value={userId?.toString()}
-          onChange={(value) => setUserId(Number(value))}
+          onChange={(value) => setUserId(value)}
           mt="xl"
+          clearable={true}
           disabled={usersLoading}
           filter={(value, item) =>
             item.label?.toLowerCase().includes(value.toLowerCase().trim()) ??
@@ -68,7 +54,7 @@ export default function ProfileStep({ done }: ProfileStepProps) {
             homeUsers?.users.map(
               (user) =>
                 ({
-                  value: user.id.toString(),
+                  value: user.uuid,
                   label: user.username ?? user.title,
                   thumb: user.thumb,
                   user,
