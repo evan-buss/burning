@@ -67,7 +67,7 @@ export function MyApp({
           }}
         >
           <Topbar />
-          <ReactQueryDevtools initialIsOpen={true} />
+          <ReactQueryDevtools />
           <Component {...pageProps} />
         </MantineProvider>
       </ColorSchemeProvider>

@@ -1,7 +1,9 @@
 import { Checkbox } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
+import { useEffect } from "react";
 import { Directory, PlexServer } from "../lib/plex/plex.model";
 import { useGetServerLibraries } from "../lib/plex/plex.service";
+import { trpc } from "../utils/trpc";
 
 export interface SelectableDirectory extends Directory {
   checked: boolean;
@@ -10,11 +12,29 @@ export interface SelectableDirectory extends Directory {
 export function LibrarySelector({
   server,
   setChoices,
+  mode = "create",
 }: {
   server: PlexServer;
   setChoices: (servers: SelectableDirectory[]) => void;
+  mode?: "create" | "update";
 }) {
   const [values, handlers] = useListState<SelectableDirectory>([]);
+  console.log(server);
+
+  trpc.useQuery(["library.get", server.clientIdentifier], {
+    enabled: mode === "update",
+    onSuccess: (libraries) => {
+      handlers.setState((items) =>
+        items.map((value) => {
+          return {
+            ...value,
+            checked: !!libraries.find((x) => x.uuid === value.uuid),
+          };
+        })
+      );
+    },
+  });
+
   useGetServerLibraries(
     server.preferredConnection,
     server.accessToken,
@@ -31,6 +51,10 @@ export function LibrarySelector({
     }
   );
 
+  useEffect(() => {
+    setChoices(values.filter((x) => x.checked));
+  }, [values]);
+
   const allChecked = values.every((value) => value.checked);
   const indeterminate = values.some((value) => value.checked) && !allChecked;
 
@@ -43,10 +67,6 @@ export function LibrarySelector({
       checked={value.checked}
       onChange={(event) => {
         handlers.setItemProp(index, "checked", event.currentTarget.checked);
-        handlers.setState((current) => {
-          setChoices(current.filter((x) => x.checked));
-          return current;
-        });
       }}
     />
   ));
@@ -58,14 +78,12 @@ export function LibrarySelector({
         indeterminate={indeterminate}
         label={server.name}
         onChange={() => {
-          handlers.setState((current) => {
-            const selected = current.map((value) => ({
+          handlers.setState((current) =>
+            current.map((value) => ({
               ...value,
               checked: !allChecked,
-            }));
-            setChoices(selected.filter((x) => x.checked));
-            return selected;
-          });
+            }))
+          );
         }}
       />
       {items}

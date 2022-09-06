@@ -1,4 +1,4 @@
-import { Card, Container, Title } from "@mantine/core";
+import { Button, Card, Container, Title } from "@mantine/core";
 import { useState } from "react";
 import {
   LibrarySelector,
@@ -10,22 +10,16 @@ import { trpc } from "../utils/trpc";
 
 export default function Settings() {
   const { classes } = useCardStyles();
-
-  const [choices, setChoices] = useState<SelectableDirectory[]>([]);
-  const { data: user } = trpc.useQuery(["user.me"]);
-  trpc.useQuery(["library.selected"], {
-    onSuccess: (libraries) =>
-      setChoices((choices) =>
-        choices.map((choice) => {
-          const exists = !!libraries.find((x) => x.uuid === choice.uuid);
-          console.log(exists);
-          choice.checked = exists ? exists : choice.checked;
-          return choice;
-        })
-      ),
-  });
-
   const { data: resources } = useGetResources();
+  const [choices, setChoices] = useState<SelectableDirectory[]>([]);
+
+  const save = trpc.useMutation(["library.update"]);
+
+  const handleClick = async () => {
+    await save.mutateAsync(
+      choices.map((c) => ({ uuid: c.uuid, address: c.connection, key: c.key }))
+    );
+  };
 
   return (
     <Container size="lg" py="xl">
@@ -37,10 +31,20 @@ export default function Settings() {
         {resources?.map((resource) => (
           <LibrarySelector
             key={resource.clientIdentifier}
+            mode="update"
             server={resource}
             setChoices={setChoices}
           />
         ))}
+
+        <Button
+          variant="outline"
+          mt="md"
+          onClick={handleClick}
+          loading={save.isLoading}
+        >
+          Save
+        </Button>
       </Card>
     </Container>
   );
