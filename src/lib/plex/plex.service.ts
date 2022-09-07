@@ -101,7 +101,7 @@ export async function getResources(
   return data;
 }
 
-export function useGetResources() {
+export function useGetResources(onSuccess?: (servers: PlexServer[]) => void) {
   const accessToken = useAuthState((state) => state.accessToken!);
   const clientId = useAuthState((state) => state.clientId);
 
@@ -110,6 +110,7 @@ export function useGetResources() {
     () => getResources(accessToken, clientId),
     {
       staleTime: 1_000 * 60 * 5,
+      onSuccess,
     }
   );
 }

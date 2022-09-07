@@ -9,22 +9,49 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import { useRouter } from "next/router";
 import { forwardRef } from "react";
+import { StepProps } from ".";
 import { useGetHomeUsers, useGetUserInfo } from "../../lib/plex/plex.service";
 import { useCardStyles } from "../../lib/styles";
 import { setUserId, useAuthState } from "../../state/auth.store";
+import { trpc } from "../../utils/trpc";
 
-interface ProfileStepProps {
-  done: () => void;
-}
-
-export default function ProfileStep({ done }: ProfileStepProps) {
+export default function ProfileStep({ done }: StepProps) {
   const { classes } = useCardStyles();
+  const { replace } = useRouter();
   const { data: account, isLoading: accountLoading } = useGetUserInfo();
   const { data: homeUsers, isLoading: usersLoading } = useGetHomeUsers(
     !!account
   );
   const userId = useAuthState((state) => state.userId);
+  const accessToken = useAuthState((state) => state.accessToken);
+
+  const { data: user } = useGetUserInfo(!!accessToken);
+  const { data: existingUser, isSuccess } = trpc.useQuery(
+    ["user.findUser", userId!],
+    {
+      enabled: !!userId,
+    }
+  );
+
+  const signIn = trpc.useMutation(["user.signIn"]);
+  const handleSignIn = async () => {
+    if (!userId) throw new Error("attempting signIn with undefined user UUID");
+    await signIn.mutateAsync(userId);
+    replace("/dashboard");
+  };
+
+  const signUp = trpc.useMutation(["user.signUp"]);
+  const handleSignUp = async () => {
+    if (!user) throw new Error("attempting signUp with undefined plex user");
+    await signUp.mutateAsync({
+      uuid: user.uuid,
+      email: user.email,
+      username: user.username,
+    });
+    done();
+  };
 
   return (
     <Card withBorder radius="md" p="xl" className={classes.card}>
@@ -64,9 +91,17 @@ export default function ProfileStep({ done }: ProfileStepProps) {
         />
       )}
 
-      <Button mt="md" variant="outline" onClick={() => done()}>
-        Next
-      </Button>
+      {isSuccess && existingUser ? (
+        <>
+          <Button mt="md" variant="outline" onClick={handleSignIn}>
+            Sign In
+          </Button>
+        </>
+      ) : (
+        <Button mt="md" variant="outline" onClick={handleSignUp}>
+          Next
+        </Button>
+      )}
     </Card>
   );
 }

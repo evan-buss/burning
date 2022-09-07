@@ -1,6 +1,5 @@
 import { Checkbox } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
-import { useEffect } from "react";
 import { Directory, PlexServer } from "../lib/plex/plex.model";
 import { useGetServerLibraries } from "../lib/plex/plex.service";
 import { trpc } from "../utils/trpc";
@@ -11,17 +10,17 @@ export interface SelectableDirectory extends Directory {
 
 export function LibrarySelector({
   server,
-  setChoices,
+  onToggle,
   mode = "create",
 }: {
   server: PlexServer;
-  setChoices: (servers: SelectableDirectory[]) => void;
+  onToggle: (directory: Directory) => void;
   mode?: "create" | "update";
 }) {
   const [values, handlers] = useListState<SelectableDirectory>([]);
   console.log(server);
 
-  trpc.useQuery(["library.get", server.clientIdentifier], {
+  trpc.useQuery(["library.get"], {
     enabled: mode === "update",
     onSuccess: (libraries) => {
       handlers.setState((items) =>
@@ -51,10 +50,6 @@ export function LibrarySelector({
     }
   );
 
-  useEffect(() => {
-    setChoices(values.filter((x) => x.checked));
-  }, [values]);
-
   const allChecked = values.every((value) => value.checked);
   const indeterminate = values.some((value) => value.checked) && !allChecked;
 
@@ -66,6 +61,7 @@ export function LibrarySelector({
       key={value.key}
       checked={value.checked}
       onChange={(event) => {
+        onToggle(value);
         handlers.setItemProp(index, "checked", event.currentTarget.checked);
       }}
     />
@@ -78,6 +74,10 @@ export function LibrarySelector({
         indeterminate={indeterminate}
         label={server.name}
         onChange={() => {
+          for (const directory of values) {
+            onToggle(directory);
+          }
+
           handlers.setState((current) =>
             current.map((value) => ({
               ...value,

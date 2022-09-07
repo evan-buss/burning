@@ -28,7 +28,6 @@ export const createContext = async ({
   req,
   res,
 }: trpcNext.CreateNextContextOptions) => {
-  console.log("context func");
   return {
     ...(await createContextInner({})),
     req,

@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -11,21 +12,44 @@ datasource db {
 }
 
 model User {
-    id           String   @id @default(cuid())
-    plexUUID     String   @unique
-    plexEmail    String
-    plexUsername String
-    updatedAt    DateTime @updatedAt
+    uuid     String @id
+    // Home users can share accounts, so multiple users could have the same email.
+    // Each home user profile has a separate UUID which uniquely identifies them.
+    email    String
+    username String
 
-    libraries Libraries[]
+    signedIn  DateTime @default(now())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-    @@unique([plexEmail, plexUsername])
+    servers   Server[]
+    libraries Library[]
 }
 
-model Libraries {
+model Server {
     uuid    String @id
+    name    String
     address String
-    key     String
 
-    user User[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    users     User[]
+    libraries Library[]
+}
+
+model Library {
+    uuid String
+    key  String
+
+    userUUID String
+    user     User   @relation(fields: [userUUID], references: [uuid])
+
+    serverUUID String
+    server     Server @relation(fields: [serverUUID], references: [uuid])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([uuid, userUUID])
 }

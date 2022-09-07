@@ -1,21 +1,28 @@
 import { Button, Card, Text, Title } from "@mantine/core";
-import { Directory } from "../../lib/plex/plex.model";
+import { StepProps } from ".";
+import { Directory, PlexServer } from "../../lib/plex/plex.model";
 import { useGetResources } from "../../lib/plex/plex.service";
 import { useCardStyles } from "../../lib/styles";
+import { trpc } from "../../utils/trpc";
 import { LibrarySelector } from "../LibrarySelector";
 
-interface SelectLibrariesStepProps {
-  done: () => void;
-  setLibraries: (library: Directory[]) => void;
-}
-
-export default function SelectLibrariesStep({
-  done,
-  setLibraries,
-}: SelectLibrariesStepProps) {
+export default function SelectLibrariesStep({ done }: StepProps) {
   const { classes } = useCardStyles();
 
-  const { data: servers } = useGetResources();
+  const upsertServers = trpc.useMutation("library.upsertServers");
+  const { data: servers } = useGetResources(async (servers) => {
+    await upsertServers.mutateAsync(
+      servers.map((server) => ({
+        address: server.preferredConnection,
+        uuid: server.clientIdentifier,
+        name: server.name,
+      }))
+    );
+  });
+
+  const handleDone = () => {
+    done();
+  };
 
   return (
     <Card withBorder radius="md" p="xl" className={classes.card}>
@@ -29,16 +36,32 @@ export default function SelectLibrariesStep({
       </Text>
 
       {servers?.map((server) => (
-        <LibrarySelector
-          setChoices={setLibraries}
-          key={server.clientIdentifier}
-          server={server}
-        />
+        <LibrarySelectorWrapper key={server.clientIdentifier} server={server} />
       ))}
 
-      <Button onClick={() => done()} variant="outline" mt="md">
+      <Button onClick={handleDone} variant="outline" mt="md">
         Done
       </Button>
     </Card>
+  );
+}
+
+export function LibrarySelectorWrapper({ server }: { server: PlexServer }) {
+  const toggleLibrary = trpc.useMutation("library.toggle");
+  const handleToggle = async (directory: Directory) => {
+    console.log("handlingToggle?");
+    await toggleLibrary.mutateAsync({
+      key: directory.key,
+      server: server.clientIdentifier,
+      uuid: directory.uuid,
+    });
+  };
+
+  return (
+    <LibrarySelector
+      onToggle={handleToggle}
+      key={server.clientIdentifier}
+      server={server}
+    />
   );
 }

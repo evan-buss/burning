@@ -10,12 +10,12 @@ import {
   Tooltip,
   Transition,
 } from "@mantine/core";
-import { setCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import { ArrowCounterClockwise } from "phosphor-react";
 import { IPlexClientDetails, PlexOauth } from "plex-oauth";
 import { useEffect, useState } from "react";
 import { useLocalStorage } from "react-use";
+import { StepProps } from ".";
 import { useGetUserInfo } from "../../lib/plex/plex.service";
 import { useCardStyles } from "../../lib/styles";
 import { setAccessToken, useAuthState } from "../../state/auth.store";
@@ -26,7 +26,7 @@ const usePlexAuth = () => {
   const [pin, setPin, removePin] = useLocalStorage<number>("pin", 123);
 
   const clientId = useAuthState((state) => state.clientId);
-  const token = useAuthState((state) => state.accessToken);
+  const accessToken = useAuthState((state) => state.accessToken);
 
   const clientInfo: IPlexClientDetails = {
     clientIdentifier: clientId, // This is a unique identifier used to identify your app with Plex.
@@ -44,13 +44,9 @@ const usePlexAuth = () => {
       if (query["postback"]) {
         console.log("postback branch");
         try {
-          const authToken = await oauth.checkForAuthToken(pin as number);
-          console.log("authToken", authToken);
-          if (authToken) {
-            console.log("before", token);
-            setAccessToken(authToken);
-            console.log("after", token);
-            setCookie("plex-token", authToken, { sameSite: "strict" });
+          const newAccessToken = await oauth.checkForAuthToken(pin as number);
+          if (newAccessToken) {
+            setAccessToken(newAccessToken);
             removePin();
           }
         } catch (error) {
@@ -72,14 +68,15 @@ const usePlexAuth = () => {
     authenticate();
   }, [query]);
 
-  return { url, token };
+  return { url, token: accessToken };
 };
 
-export default function SignInStep({ done }: { done: () => void }) {
+export default function SignInStep({ done }: StepProps) {
   const { classes } = useCardStyles();
   const { url, token } = usePlexAuth();
 
   const { data: account } = useGetUserInfo(!!token);
+  console.log("account", account);
 
   return (
     <Card withBorder radius="md" p="xl" className={classes.card}>

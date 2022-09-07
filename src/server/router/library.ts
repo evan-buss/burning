@@ -3,15 +3,12 @@ import { createProtectedRouter } from "./context";
 
 export const libraryRouter = createProtectedRouter()
   .query("get", {
-    input: z.string(),
-    async resolve({ input: server, ctx }) {
-      const userId = ctx.session.user.id;
-
-      const data = await ctx.prisma.user.findUniqueOrThrow({
+    async resolve({ ctx: { prisma, session } }) {
+      const data = await prisma.user.findUniqueOrThrow({
         where: {
-          id: userId,
+          uuid: session.user.id,
         },
-        select: {
+        include: {
           libraries: true,
         },
       });
@@ -19,67 +16,80 @@ export const libraryRouter = createProtectedRouter()
       return data?.libraries;
     },
   })
-  .mutation("update", {
+  .mutation("upsertServers", {
     input: z.array(
       z.object({
-        uuid: z.string().uuid(),
+        uuid: z.string(),
+        name: z.string(),
         address: z.string().url(),
-        key: z.string(),
       })
     ),
-    async resolve({ input, ctx }) {
-      const userId = ctx.session.user.id;
-
-      // Remove all user references to specific libraries
-      await ctx.prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          libraries: {
-            set: [],
-          },
-        },
-        include: {
-          libraries: true,
-        },
-      });
-
-      // Add references to the selected libraries.
-      await ctx.prisma.$transaction(
-        input.map((library) =>
-          ctx.prisma.libraries.upsert({
+    async resolve({
+      input: servers,
+      ctx: {
+        prisma,
+        session: { user },
+      },
+    }) {
+      await prisma.$transaction(
+        servers.map(({ uuid, name, address }) =>
+          prisma.server.upsert({
             create: {
-              address: library.address,
-              uuid: library.uuid,
-              key: library.key,
-              user: {
-                connect: {
-                  id: userId,
-                },
-              },
+              uuid,
+              name,
+              address,
             },
             update: {
-              address: library.address,
-              uuid: library.uuid,
-              key: library.key,
-              user: {
-                connect: {
-                  id: userId,
-                },
+              uuid,
+              name,
+              address,
+              users: {
+                connect: [{ uuid: user.id }],
               },
             },
             where: {
-              uuid: library.uuid,
+              uuid,
             },
           })
         )
       );
+    },
+  })
+  .mutation("toggle", {
+    input: z.object({
+      uuid: z.string().uuid(),
+      key: z.string(),
+      server: z.string(),
+    }),
+    async resolve({ input, ctx: { prisma, session } }) {
+      return await prisma.$transaction(async (prismaT) => {
+        const library = await prismaT.library.findFirst({
+          where: {
+            uuid: input.uuid,
+            userUUID: session.user.id,
+            serverUUID: input.server,
+          },
+        });
 
-      // await ctx.prisma.user.deleteMany({
-
-      // })
-
-      console.log(`updated ${input.length} records for ${userId}`);
+        if (library) {
+          await prismaT.library.delete({
+            where: {
+              uuid_userUUID: {
+                userUUID: session.user.id,
+                uuid: input.uuid,
+              },
+            },
+          });
+        } else {
+          await prismaT.library.create({
+            data: {
+              uuid: input.uuid,
+              userUUID: session.user.id,
+              serverUUID: input.server,
+              key: input.key,
+            },
+          });
+        }
+      });
     },
   });
