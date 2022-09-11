@@ -1,4 +1,4 @@
-import { Container, Stepper } from "@mantine/core";
+import { Stepper } from "@mantine/core";
 import { useCounter } from "@mantine/hooks";
 import { useRouter } from "next/router";
 import { Key, User } from "phosphor-react";
@@ -15,33 +15,31 @@ export default function Setup() {
   const accessToken = useBurningStore((state) => state.accessToken);
 
   return (
-    <Container size="lg">
-      <Stepper
-        active={active}
-        onStepClick={handlers.set}
-        breakpoint="sm"
-        className="p-0 pt-4 sm:p-[48px]"
+    <Stepper
+      active={active}
+      onStepClick={handlers.set}
+      breakpoint="sm"
+      className="p-0 pt-4 sm:p-2xl"
+    >
+      <Stepper.Step progressIcon={<Key weight="bold" />} label="Sign In">
+        <SignInStep done={handlers.increment} />
+      </Stepper.Step>
+      <Stepper.Step
+        allowStepSelect={!!accessToken}
+        progressIcon={<User weight="bold" />}
+        label="Pick Profile"
       >
-        <Stepper.Step progressIcon={<Key weight="bold" />} label="Sign In">
-          <SignInStep done={handlers.increment} />
-        </Stepper.Step>
-        <Stepper.Step
-          allowStepSelect={!!accessToken}
-          progressIcon={<User weight="bold" />}
-          label="Pick Profile"
-        >
-          <ProfileStep done={handlers.increment} />
-        </Stepper.Step>
-        <Stepper.Step
-          allowStepSelect={active > 1 && !!accessToken}
-          label="Choose Libraries"
-        >
-          <SelectLibrariesStep done={handlers.increment} />
-        </Stepper.Step>
-        <Stepper.Completed>
-          <CompletedStep done={() => replace("/dashboard")} />
-        </Stepper.Completed>
-      </Stepper>
-    </Container>
+        <ProfileStep done={handlers.increment} />
+      </Stepper.Step>
+      <Stepper.Step
+        allowStepSelect={active > 1 && !!accessToken}
+        label="Choose Libraries"
+      >
+        <SelectLibrariesStep done={handlers.increment} />
+      </Stepper.Step>
+      <Stepper.Completed>
+        <CompletedStep done={() => replace("/dashboard")} />
+      </Stepper.Completed>
+    </Stepper>
   );
 }

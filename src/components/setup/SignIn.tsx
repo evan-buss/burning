@@ -16,16 +16,14 @@ import { IPlexClientDetails, PlexOauth } from "plex-oauth";
 import { useEffect, useState } from "react";
 import { useLocalStorage } from "react-use";
 import { StepProps } from ".";
-import { useGetUserInfo } from "../../lib/plex/hooks";
-import { setAccessToken, useBurningStore } from "../../state/store";
+import { usePlexAccount } from "../../lib/plex/hooks";
+import { setAccessToken, usePlexCredentials } from "../../state/store";
 
 const usePlexAuth = () => {
   const { query, replace } = useRouter();
   const [url, setUrl] = useState<string | undefined>(undefined);
   const [pin, setPin, removePin] = useLocalStorage<number>("pin", 123);
-
-  const clientId = useBurningStore((state) => state.clientId);
-  const accessToken = useBurningStore((state) => state.accessToken);
+  const { accessToken, clientId } = usePlexCredentials();
 
   const clientInfo: IPlexClientDetails = {
     clientIdentifier: clientId, // This is a unique identifier used to identify your app with Plex.
@@ -73,7 +71,7 @@ const usePlexAuth = () => {
 export default function SignInStep({ done }: StepProps) {
   const { url, token } = usePlexAuth();
 
-  const { data: account } = useGetUserInfo(!!token);
+  const { data: account } = usePlexAccount(!!token);
   console.log("account", account);
 
   return (
@@ -99,7 +97,7 @@ export default function SignInStep({ done }: StepProps) {
                   {account?.email}
                 </Text>
               </div>
-              <Tooltip label="Sign In Again">
+              <Tooltip label="Sign In Again" color="dark">
                 <ActionIcon color="yellow" size="lg" component="a" href={url}>
                   <ArrowCounterClockwise size={24} />
                 </ActionIcon>

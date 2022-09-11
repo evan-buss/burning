@@ -10,11 +10,11 @@ import {
 import { MediaContainer, PlexServer } from "./models";
 
 // Get account details for the signin in user.
-export function useGetUserInfo(enabled = true) {
+export function usePlexAccount(enabled: boolean) {
   const { accessToken, clientId } = usePlexCredentials();
 
-  return useQuery(["plex", "user"], () => getUserInfo(accessToken, clientId), {
-    enabled,
+  return useQuery(["plex", "user"], () => getUserInfo(accessToken!, clientId), {
+    enabled: enabled && !!accessToken,
   });
 }
 
@@ -27,7 +27,7 @@ export function usePlexProfiles(enabled: boolean) {
 
   return useQuery(
     ["plex", "home-users"],
-    () => getPlexProfiles(accessToken, clientId),
+    () => getPlexProfiles(accessToken!, clientId),
     {
       enabled: enabled && !!accessToken,
     }
@@ -37,15 +37,13 @@ export function usePlexProfiles(enabled: boolean) {
 export function usePlexServers(onSuccess?: (servers: PlexServer[]) => void) {
   const { accessToken, clientId } = usePlexCredentials();
 
-  if (!accessToken)
-    throw new Error("usePlexServers requires account access token");
-
   return useQuery(
     ["plex", "resources"],
-    () => getPlexServers(accessToken, clientId),
+    () => getPlexServers(accessToken!, clientId),
     {
       staleTime: 1_000 * 60 * 5,
       onSuccess,
+      enabled: !!accessToken,
     }
   );
 }

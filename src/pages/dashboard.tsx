@@ -1,12 +1,5 @@
-import {
-  Button,
-  Card,
-  Container,
-  Group,
-  Image,
-  Loader,
-  Title,
-} from "@mantine/core";
+import { Button, Card, Group, Image, Loader, Title } from "@mantine/core";
+import { NextLink } from "@mantine/next";
 import type { Library } from "@prisma/client";
 import { usePlexLibrary, usePlexServers } from "../lib/plex/hooks";
 import { trpc } from "../utils/trpc";
@@ -16,12 +9,12 @@ export default function Dashboard() {
   const { data: servers } = usePlexServers();
 
   return (
-    <Container>
+    <>
       {servers &&
         libraries?.map((library) => (
           <LibrarySection key={library.key} library={library} />
         ))}
-    </Container>
+    </>
   );
 }
 
@@ -40,7 +33,13 @@ function LibrarySection({ library }: { library: Library }) {
     <Card className="mx-0 overflow-auto sm:m-xl" withBorder>
       <Group position="apart">
         <Title order={3}>{data?.title1}</Title>
-        <Button variant="outline" size="xs" className="h-xl">
+        <Button
+          component={NextLink}
+          href={`/voting/${library.uuid}`}
+          variant="outline"
+          size="xs"
+          className="h-xl"
+        >
           Review
         </Button>
       </Group>
@@ -54,13 +53,13 @@ function LibrarySection({ library }: { library: Library }) {
         ></Overlay> */}
         {data?.Metadata?.slice(0, 10).map((media) => (
           <Image
+            key={media.key}
             onClick={() => alert("clicked")}
             height={160}
             width="auto"
             fit="contain"
             radius="md"
             alt={`${media.title} thumbnail`}
-            key={media.key}
             src={`${server.preferredConnection}${media.thumb}?X-Plex-Token=${server.accessToken}`}
           />
         )) ?? []}

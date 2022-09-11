@@ -10,11 +10,9 @@ import {
 } from "./models";
 
 export async function getPlexHomeUsers(
-  accessToken: string | null,
+  accessToken: string,
   clientId: string
 ): Promise<UsersRoot> {
-  if (!accessToken) throw new Error("access token undefined");
-
   const resp = await fetch("https://plex.tv/api/v2/home/users", {
     headers: {
       accept: "application/json",
@@ -27,11 +25,9 @@ export async function getPlexHomeUsers(
 }
 
 export async function getUserInfo(
-  accessToken: string | null,
+  accessToken: string,
   clientId: string
 ): Promise<AccountInfo> {
-  if (!accessToken) throw new Error("access token undefined");
-
   const resp = await fetch("https://plex.tv/api/v2/user", {
     headers: {
       accept: "application/json",

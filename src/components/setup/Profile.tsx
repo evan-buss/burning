@@ -12,22 +12,24 @@ import {
 import { useRouter } from "next/router";
 import { forwardRef } from "react";
 import { StepProps } from ".";
-import { useGetUserInfo, usePlexProfiles } from "../../lib/plex/hooks";
+import { usePlexAccount, usePlexProfiles } from "../../lib/plex/hooks";
 import { setUserId, useBurningStore } from "../../state/store";
 import { trpc } from "../../utils/trpc";
 
 export default function ProfileStep({ done }: StepProps) {
   const { replace } = useRouter();
-  const { data: account, isLoading: accountLoading } = useGetUserInfo();
-  const { data: homeUsers, isLoading: usersLoading } = usePlexProfiles(
-    !!account
-  );
+
   const userId = useBurningStore((state) => state.userId);
   const accessToken = useBurningStore((state) => state.accessToken);
 
-  const { data: user } = useGetUserInfo(!!accessToken);
+  const { data: account } = usePlexAccount(!!userId);
+  const { data: homeUsers, isLoading: usersLoading } = usePlexProfiles(
+    !!account
+  );
+
+  const { data: user } = usePlexAccount(!!accessToken);
   const { data: existingUser, isSuccess } = trpc.useQuery(
-    ["user.findUser", userId!],
+    ["user.findUser", userId],
     {
       enabled: !!userId,
     }
@@ -35,6 +37,7 @@ export default function ProfileStep({ done }: StepProps) {
 
   const signIn = trpc.useMutation(["user.signIn"]);
   const handleSignIn = async () => {
+    console.log("user", user);
     if (!userId) throw new Error("attempting signIn with undefined user UUID");
     await signIn.mutateAsync(userId);
     replace("/dashboard");
@@ -42,11 +45,17 @@ export default function ProfileStep({ done }: StepProps) {
 
   const signUp = trpc.useMutation(["user.signUp"]);
   const handleSignUp = async () => {
-    if (!user) throw new Error("attempting signUp with undefined plex user");
+    const homeUser = homeUsers?.users.find((x) => x.uuid === userId);
+
+    if (!user) throw new Error("unable to load user's account");
+    if (!homeUser) throw new Error("unable to find the selected home user");
+
+    console.log("homeUser", homeUser);
+
     await signUp.mutateAsync({
-      uuid: user.uuid,
-      email: user.email,
-      username: user.username,
+      uuid: homeUser.uuid,
+      email: homeUser.email ?? user.email,
+      username: homeUser.username ?? user.username,
     });
     done();
   };

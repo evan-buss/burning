@@ -1,7 +1,7 @@
-import { Card, Container, Title } from "@mantine/core";
+import { Card, Title } from "@mantine/core";
 import {
   LibrarySelector,
-  SelectableDirectory,
+  SelectableDirectory
 } from "../components/LibrarySelector";
 import { usePlexServers } from "../lib/plex/hooks";
 import { PlexServer } from "../lib/plex/models";
@@ -24,7 +24,18 @@ export default function Settings() {
   };
 
   return (
-    <Container>
+    <>
+      <Card
+        withBorder
+        radius="md"
+        p="xl"
+        className="mx-0 overflow-auto sm:m-xl"
+      >
+        <Title order={2} mb="md">
+          Switch Profile
+        </Title>
+      </Card>
+
       <Card
         withBorder
         radius="md"
@@ -44,6 +55,6 @@ export default function Settings() {
           />
         ))}
       </Card>
-    </Container>
+    </>
   );
 }

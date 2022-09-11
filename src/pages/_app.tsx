@@ -10,22 +10,29 @@ import { httpLink } from "@trpc/client/links/httpLink";
 import { loggerLink } from "@trpc/client/links/loggerLink";
 import { withTRPC } from "@trpc/next";
 import { getCookie, setCookie } from "cookies-next";
-import { GetServerSidePropsContext } from "next";
+import { GetServerSidePropsContext, NextPage } from "next";
 import { AppProps } from "next/app";
 import Head from "next/head";
-import { useState } from "react";
+import { ReactElement, ReactNode, useState } from "react";
 import { ReactQueryDevtools } from "react-query/devtools";
 import superjson from "superjson";
-import resolveConfig from "tailwindcss/resolveConfig";
-import customConfig from "../../tailwind.config";
-import Topbar from "../components/Topbar";
+import Layout from "../components/layout/Layout";
 import type { AppRouter } from "../server/router";
 import "../styles/global.css";
 
-export function MyApp({
-  Component,
-  pageProps,
-}: AppProps & { pageProps: { colorScheme: ColorScheme } }) {
+export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<
+  P,
+  IP
+> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type CustomAppProps = AppProps & {
+  Component: NextPageWithLayout;
+  pageProps: { colorScheme: ColorScheme };
+};
+
+export function MyApp({ Component, pageProps }: CustomAppProps) {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(
     pageProps.colorScheme
   );
@@ -41,7 +48,7 @@ export function MyApp({
     });
   };
 
-  const config = resolveConfig(customConfig);
+  const getLayout = Component.getLayout || ((page) => <Layout>{page}</Layout>);
 
   return (
     <>
@@ -71,8 +78,7 @@ export function MyApp({
             colorScheme: colorScheme,
           }}
         >
-          <Topbar />
-          <Component {...pageProps} />
+          {getLayout(<Component {...pageProps} />)}
           <ReactQueryDevtools />
         </MantineProvider>
       </ColorSchemeProvider>
@@ -127,5 +133,5 @@ export default withTRPC<AppRouter>({
   /**
    * @link https://trpc.io/docs/ssr
    */
-  ssr: true,
+  ssr: false,
 })(MyApp);

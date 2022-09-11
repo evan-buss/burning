@@ -84,7 +84,7 @@ export const setUserId = (userId: string | null) =>
     state.userId = userId;
   });
 
-export const signOut = () =>
+export const resetUserState = () =>
   useBurningStore.setState((state) => {
     state.accessToken = null;
     state.userId = null;

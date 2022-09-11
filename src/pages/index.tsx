@@ -1,7 +1,9 @@
 import { Button, Container, Group, Text, Title } from "@mantine/core";
 import Link from "next/link";
+import { ReactElement } from "react";
+import AnonLayout from "../components/layout/AnonLayout";
 
-export default function HeroTitle() {
+export default function HomePage() {
   return (
     <div className="flex items-center justify-center bg-white dark:bg-dark-8">
       <Container size={700}>
@@ -30,7 +32,7 @@ export default function HeroTitle() {
           </Text>
         </Text>
 
-        <Group className="mt-xl sm:mt-[48px]" position="center">
+        <Group className="mt-xl sm:mt-2xl" position="center">
           <Link href="/setup" passHref>
             <Button
               component="a"
@@ -58,3 +60,7 @@ export default function HeroTitle() {
     </div>
   );
 }
+
+HomePage.getLayout = (page: ReactElement) => {
+  return <AnonLayout>{page}</AnonLayout>;
+};
