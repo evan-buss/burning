@@ -13,12 +13,10 @@ import { useRouter } from "next/router";
 import { forwardRef } from "react";
 import { StepProps } from ".";
 import { useGetHomeUsers, useGetUserInfo } from "../../lib/plex/plex.service";
-import { useCardStyles } from "../../lib/styles";
 import { setUserId, useAuthState } from "../../state/auth.store";
 import { trpc } from "../../utils/trpc";
 
 export default function ProfileStep({ done }: StepProps) {
-  const { classes } = useCardStyles();
   const { replace } = useRouter();
   const { data: account, isLoading: accountLoading } = useGetUserInfo();
   const { data: homeUsers, isLoading: usersLoading } = useGetHomeUsers(
@@ -54,7 +52,7 @@ export default function ProfileStep({ done }: StepProps) {
   };
 
   return (
-    <Card withBorder radius="md" p="xl" className={classes.card}>
+    <Card withBorder radius="md" p="xl" className="mx-0 overflow-auto sm:m-xl">
       <Title order={2} mb="md">
         Pick Your Plex Profile
       </Title>

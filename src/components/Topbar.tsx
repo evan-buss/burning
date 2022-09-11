@@ -1,7 +1,6 @@
 import {
   Avatar,
   Container,
-  createStyles,
   Group,
   Header,
   Menu,
@@ -21,41 +20,6 @@ import { signOut, useAuthState } from "../state/auth.store";
 
 const HEADER_HEIGHT = 84;
 
-const useStyles = createStyles((theme) => ({
-  inner: {
-    height: HEADER_HEIGHT,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-
-  logo: {
-    borderRadius: theme.radius.md,
-    cursor: "pointer",
-    "&:hover": {
-      textDecoration: "underline",
-    },
-  },
-
-  burger: {
-    [theme.fn.largerThan("sm")]: {
-      display: "none",
-    },
-  },
-
-  links: {
-    paddingTop: theme.spacing.lg,
-    height: HEADER_HEIGHT,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-
-    [theme.fn.smallerThan("sm")]: {
-      display: "none",
-    },
-  },
-}));
-
 const useUser = () => {
   const userId = useAuthState((state) => state.userId);
   const { data } = useGetHomeUsers(true);
@@ -63,14 +27,15 @@ const useUser = () => {
 };
 
 export default function Topbar() {
-  const { classes } = useStyles();
   const user = useUser();
 
   return (
     <Header height={HEADER_HEIGHT}>
-      <Container className={classes.inner}>
-        <Link href="/">
-          <Group className={classes.logo}>
+      <Container
+        className={`flex h-[${HEADER_HEIGHT}px] items-center justify-between`}
+      >
+        <Link href={user ? "/dashboard" : "/"}>
+          <Group className="cursor-pointer rounded-md hover:underline">
             <Fire size={34} weight="bold" />
             <Title order={1}>Burning</Title>
           </Group>
@@ -89,6 +54,7 @@ export default function Topbar() {
           opened={opened}
           onClick={toggle}
           className={classes.burger}
+          className="sm:hidden"
           size="sm"
         /> */}
       </Container>

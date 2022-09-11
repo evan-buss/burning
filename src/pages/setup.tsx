@@ -1,4 +1,4 @@
-import { Container, createStyles, Stepper } from "@mantine/core";
+import { Container, Stepper } from "@mantine/core";
 import { useCounter } from "@mantine/hooks";
 import { useRouter } from "next/router";
 import { Key, User } from "phosphor-react";
@@ -8,17 +8,7 @@ import ProfileStep from "../components/setup/Profile";
 import SignInStep from "../components/setup/SignIn";
 import { useAuthState } from "../state/auth.store";
 
-const useStyles = createStyles((theme) => ({
-  stepper: {
-    padding: theme.spacing.xl * 2,
-    [theme.fn.smallerThan("sm")]: {
-      padding: 0,
-    },
-  },
-}));
-
 export default function Setup() {
-  const { classes } = useStyles();
   const { replace } = useRouter();
   const [active, handlers] = useCounter(0, { min: 0, max: 3 });
 
@@ -30,7 +20,7 @@ export default function Setup() {
         active={active}
         onStepClick={handlers.set}
         breakpoint="sm"
-        className={classes.stepper}
+        className="p-0 pt-4 sm:p-[48px]"
       >
         <Stepper.Step progressIcon={<Key weight="bold" />} label="Sign In">
           <SignInStep done={handlers.increment} />

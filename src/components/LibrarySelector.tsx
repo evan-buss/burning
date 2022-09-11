@@ -3,6 +3,7 @@ import { useListState } from "@mantine/hooks";
 import { Directory, PlexServer } from "../lib/plex/plex.model";
 import { useGetServerLibraries } from "../lib/plex/plex.service";
 import { trpc } from "../utils/trpc";
+import { sleep } from "../utils/utils";
 
 export interface SelectableDirectory extends Directory {
   checked: boolean;
@@ -14,14 +15,30 @@ export function LibrarySelector({
   mode = "create",
 }: {
   server: PlexServer;
-  onToggle: (directory: Directory) => void;
+  onToggle: (directory: SelectableDirectory) => void;
   mode?: "create" | "update";
 }) {
   const [values, handlers] = useListState<SelectableDirectory>([]);
-  console.log(server);
+
+  // Load all libraries for the server, keeping
+  const { data: libraries } = useGetServerLibraries(
+    server.preferredConnection,
+    server.accessToken,
+    ({ Directory: directory }) => {
+      handlers.setState(
+        directory.map(
+          (dir) =>
+            ({
+              ...dir,
+              checked: values.find((x) => x.uuid === dir.uuid)?.checked,
+            } as SelectableDirectory)
+        ) ?? []
+      );
+    }
+  );
 
   trpc.useQuery(["library.get"], {
-    enabled: mode === "update",
+    enabled: mode === "update" && !!libraries,
     onSuccess: (libraries) => {
       handlers.setState((items) =>
         items.map((value) => {
@@ -34,24 +51,23 @@ export function LibrarySelector({
     },
   });
 
-  useGetServerLibraries(
-    server.preferredConnection,
-    server.accessToken,
-    (data) => {
-      const items =
-        data?.Directory.map((dir) => {
-          return {
-            ...dir,
-            // keep checked state of existing values
-            checked: values.find((x) => x.uuid === dir.uuid)?.checked ?? false,
-          } as SelectableDirectory;
-        }) ?? [];
-      handlers.setState(items);
-    }
-  );
-
   const allChecked = values.every((value) => value.checked);
   const indeterminate = values.some((value) => value.checked) && !allChecked;
+
+  const toggleAll = async () => {
+    handlers.setState((current) =>
+      current.map((value) => ({
+        ...value,
+        checked: !allChecked,
+      }))
+    );
+
+    for (const directory of values.filter((x) => x.checked !== !allChecked)) {
+      // HACK: SQLITE issues receiving too many write requests...
+      await sleep(50);
+      onToggle({ ...directory, checked: !allChecked });
+    }
+  };
 
   const items = values?.map((value, index) => (
     <Checkbox
@@ -61,7 +77,7 @@ export function LibrarySelector({
       key={value.key}
       checked={value.checked}
       onChange={(event) => {
-        onToggle(value);
+        onToggle({ ...value, checked: !value.checked });
         handlers.setItemProp(index, "checked", event.currentTarget.checked);
       }}
     />
@@ -73,18 +89,7 @@ export function LibrarySelector({
         checked={allChecked}
         indeterminate={indeterminate}
         label={server.name}
-        onChange={() => {
-          for (const directory of values) {
-            onToggle(directory);
-          }
-
-          handlers.setState((current) =>
-            current.map((value) => ({
-              ...value,
-              checked: !allChecked,
-            }))
-          );
-        }}
+        onChange={toggleAll}
       />
       {items}
     </>

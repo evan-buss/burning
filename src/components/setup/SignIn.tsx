@@ -17,7 +17,6 @@ import { useEffect, useState } from "react";
 import { useLocalStorage } from "react-use";
 import { StepProps } from ".";
 import { useGetUserInfo } from "../../lib/plex/plex.service";
-import { useCardStyles } from "../../lib/styles";
 import { setAccessToken, useAuthState } from "../../state/auth.store";
 
 const usePlexAuth = () => {
@@ -72,14 +71,13 @@ const usePlexAuth = () => {
 };
 
 export default function SignInStep({ done }: StepProps) {
-  const { classes } = useCardStyles();
   const { url, token } = usePlexAuth();
 
   const { data: account } = useGetUserInfo(!!token);
   console.log("account", account);
 
   return (
-    <Card withBorder radius="md" p="xl" className={classes.card}>
+    <Card withBorder radius="md" p="xl" className="mx-0 overflow-auto sm:m-xl">
       <Title order={2} mb="md">
         Sign In To Your Plex Account
       </Title>

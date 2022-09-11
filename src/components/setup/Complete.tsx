@@ -7,18 +7,16 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { Medal } from "phosphor-react";
-import { useCardStyles } from "../../lib/styles";
 
 interface CompletedStepProps {
   done: () => void;
 }
 
 export default function CompletedStep({ done }: CompletedStepProps) {
-  const { classes } = useCardStyles();
   const theme = useMantineTheme();
 
   return (
-    <Card withBorder radius="md" p="xl" className={classes.card}>
+    <Card withBorder radius="md" p="xl" className="mx-0 overflow-auto sm:m-xl">
       <Title order={2} mb="md" align="center">
         <Medal
           color={theme.fn.primaryColor()}

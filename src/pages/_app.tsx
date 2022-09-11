@@ -16,6 +16,8 @@ import Head from "next/head";
 import { useState } from "react";
 import { ReactQueryDevtools } from "react-query/devtools";
 import superjson from "superjson";
+import resolveConfig from "tailwindcss/resolveConfig";
+import customConfig from "../../tailwind.config";
 import Topbar from "../components/Topbar";
 import type { AppRouter } from "../server/router";
 import "../styles/global.css";
@@ -38,6 +40,8 @@ export function MyApp({
       sameSite: "strict",
     });
   };
+
+  const config = resolveConfig(customConfig);
 
   return (
     <>
@@ -68,8 +72,8 @@ export function MyApp({
           }}
         >
           <Topbar />
-          <ReactQueryDevtools />
           <Component {...pageProps} />
+          <ReactQueryDevtools />
         </MantineProvider>
       </ColorSchemeProvider>
     </>

@@ -1,27 +1,36 @@
 import { Card, Container, Title } from "@mantine/core";
-import { LibrarySelector } from "../components/LibrarySelector";
-import { Directory, PlexServer } from "../lib/plex/plex.model";
+import {
+  LibrarySelector,
+  SelectableDirectory,
+} from "../components/LibrarySelector";
+import { PlexServer } from "../lib/plex/plex.model";
 import { useGetResources } from "../lib/plex/plex.service";
-import { useCardStyles } from "../lib/styles";
 import { trpc } from "../utils/trpc";
 
 export default function Settings() {
-  const { classes } = useCardStyles();
   const { data: resources } = useGetResources();
-
   const toggleLibrary = trpc.useMutation("library.toggle");
-  const handleToggle = async (server: PlexServer, directory: Directory) => {
-    console.log("handlingToggle?");
+
+  const handleToggle = async (
+    server: PlexServer,
+    directory: SelectableDirectory
+  ) => {
     await toggleLibrary.mutateAsync({
       key: directory.key,
       server: server.clientIdentifier,
       uuid: directory.uuid,
+      mode: directory.checked ? "on" : "off",
     });
   };
 
   return (
-    <Container size="lg" py="xl">
-      <Card withBorder radius="md" p="xl" className={classes.card}>
+    <Container>
+      <Card
+        withBorder
+        radius="md"
+        p="xl"
+        className="mx-0 overflow-auto sm:m-xl"
+      >
         <Title order={2} mb="md">
           Choose Your Plex Libraries
         </Title>

@@ -173,3 +173,117 @@ export interface Service {
   secret?: string;
   status: string;
 }
+
+// Library Contents
+
+export interface PlexLibrary {
+  Metadata: PlexLibraryMetadata;
+}
+
+export interface PlexLibraryMetadata {
+  size: number;
+  allowSync: boolean;
+  art: string;
+  identifier: string;
+  librarySectionID: number;
+  librarySectionTitle: string;
+  librarySectionUUID: string;
+  mediaTagPrefix: string;
+  mediaTagVersion: number;
+  thumb: string;
+  title1: string;
+  title2: string;
+  viewGroup: string;
+  viewMode: number;
+  Metadata: PlexContentMetadata[];
+}
+
+export interface PlexContentMetadata {
+  ratingKey: string;
+  key: string;
+  guid: string;
+  studio?: string;
+  type: string;
+  title: string;
+  contentRating?: string;
+  summary: string;
+  audienceRating?: number;
+  year?: number;
+  tagline?: string;
+  thumb: string;
+  art: string;
+  duration: number;
+  originallyAvailableAt?: string;
+  addedAt: number;
+  updatedAt: number;
+  audienceRatingImage?: string;
+  chapterSource?: string;
+  primaryExtraKey?: string;
+  Media: Medum[];
+  Genre?: Genre[];
+  Director?: Director[];
+  Writer?: Writer[];
+  Country?: Country[];
+  Role?: Role[];
+  viewCount?: number;
+  lastViewedAt?: number;
+  titleSort?: string;
+  originalTitle?: string;
+  viewOffset?: number;
+  skipCount?: number;
+}
+
+export interface Medum {
+  id: number;
+  duration: number;
+  bitrate: number;
+  width: number;
+  height: number;
+  aspectRatio: number;
+  audioChannels: number;
+  audioCodec: string;
+  videoCodec: string;
+  videoResolution: string;
+  container: string;
+  videoFrameRate: string;
+  audioProfile?: string;
+  videoProfile: string;
+  Part: Part[];
+  optimizedForStreaming?: number;
+  has64bitOffsets?: boolean;
+}
+
+export interface Part {
+  id: number;
+  key: string;
+  duration: number;
+  file: string;
+  size: number;
+  audioProfile?: string;
+  container: string;
+  videoProfile: string;
+  has64bitOffsets?: boolean;
+  optimizedForStreaming?: boolean;
+  hasThumbnail?: string;
+  hasChapterVideoStream?: boolean;
+}
+
+export interface Genre {
+  tag: string;
+}
+
+export interface Director {
+  tag: string;
+}
+
+export interface Writer {
+  tag: string;
+}
+
+export interface Country {
+  tag: string;
+}
+
+export interface Role {
+  tag: string;
+}

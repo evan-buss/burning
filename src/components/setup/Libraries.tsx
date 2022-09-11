@@ -1,15 +1,12 @@
 import { Button, Card, Text, Title } from "@mantine/core";
 import { StepProps } from ".";
-import { Directory, PlexServer } from "../../lib/plex/plex.model";
+import { PlexServer } from "../../lib/plex/plex.model";
 import { useGetResources } from "../../lib/plex/plex.service";
-import { useCardStyles } from "../../lib/styles";
 import { trpc } from "../../utils/trpc";
-import { LibrarySelector } from "../LibrarySelector";
+import { LibrarySelector, SelectableDirectory } from "../LibrarySelector";
 
 export default function SelectLibrariesStep({ done }: StepProps) {
-  const { classes } = useCardStyles();
-
-  const upsertServers = trpc.useMutation("library.upsertServers");
+  const upsertServers = trpc.useMutation("server.upsert");
   const { data: servers } = useGetResources(async (servers) => {
     await upsertServers.mutateAsync(
       servers.map((server) => ({
@@ -25,7 +22,7 @@ export default function SelectLibrariesStep({ done }: StepProps) {
   };
 
   return (
-    <Card withBorder radius="md" p="xl" className={classes.card}>
+    <Card withBorder radius="md" p="xl" className="mx-0 overflow-auto sm:m-xl">
       <Title order={2} mb="md">
         Choose Your Plex Libraries
       </Title>
@@ -48,12 +45,13 @@ export default function SelectLibrariesStep({ done }: StepProps) {
 
 export function LibrarySelectorWrapper({ server }: { server: PlexServer }) {
   const toggleLibrary = trpc.useMutation("library.toggle");
-  const handleToggle = async (directory: Directory) => {
+  const handleToggle = async (directory: SelectableDirectory) => {
     console.log("handlingToggle?");
     await toggleLibrary.mutateAsync({
       key: directory.key,
       server: server.clientIdentifier,
       uuid: directory.uuid,
+      mode: directory.checked ? "on" : "off",
     });
   };
 

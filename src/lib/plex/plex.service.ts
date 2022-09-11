@@ -1,9 +1,11 @@
 import axios from "axios";
 import { useQuery } from "react-query";
 import { useAuthState } from "../../state/auth.store";
+import { setServers } from "../../state/plex.store";
 import {
   AccountInfo,
   MediaContainer,
+  PlexLibraryMetadata,
   PlexServer,
   UsersRoot,
 } from "./plex.model";
@@ -98,6 +100,8 @@ export async function getResources(
     server.preferredConnection = connection.uri;
   }
 
+  setServers(data);
+
   return data;
 }
 
@@ -142,7 +146,7 @@ export async function getServerLibraries(
 export function useGetServerLibraries(
   serverAddress: string,
   accessToken: string,
-  onSuccess?: (data: MediaContainer) => void
+  onSuccess?: (data: PlexLibraryMetadata) => void
 ) {
   const clientId = useAuthState((state) => state.clientId);
 
@@ -160,7 +164,7 @@ export async function getLibrary(
   accessToken: string,
   clientId: string,
   libraryKey: string
-): Promise<MediaContainer> {
+): Promise<PlexLibraryMetadata> {
   const { data } = await axios.get(
     `${serverAddress}/library/sections/${libraryKey}/all`,
     {
@@ -181,7 +185,7 @@ export async function getLibrary(
   return data.MediaContainer;
 }
 
-export async function useGetLibrary(
+export function useGetLibrary(
   serverAddress: string,
   accessToken: string,
   libraryKey: string

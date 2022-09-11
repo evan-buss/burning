@@ -1,80 +1,15 @@
-import { Button, Container, createStyles, Group, Text } from "@mantine/core";
+import { Button, Container, Group, Text, Title } from "@mantine/core";
 import Link from "next/link";
 
-const BREAKPOINT = "@media (max-width: 755px)";
-
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor:
-      theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white,
-  },
-
-  inner: {
-    // position: "relative",
-    // paddingTop: 200,
-    // paddingBottom: 120,
-    // [BREAKPOINT]: {
-    //   paddingBottom: 80,
-    //   paddingTop: 80,
-    // },
-  },
-
-  title: {
-    fontFamily: `${theme.headings.fontFamily}`,
-    fontSize: 62,
-    fontWeight: 900,
-    lineHeight: 1.1,
-    margin: 0,
-    padding: 0,
-    color: theme.colorScheme === "dark" ? theme.white : theme.black,
-
-    [BREAKPOINT]: {
-      fontSize: 42,
-      lineHeight: 1.2,
-    },
-  },
-
-  description: {
-    marginTop: theme.spacing.xl,
-    fontSize: 24,
-
-    [BREAKPOINT]: {
-      fontSize: 18,
-    },
-  },
-
-  controls: {
-    marginTop: theme.spacing.xl * 2,
-
-    [BREAKPOINT]: {
-      marginTop: theme.spacing.xl,
-    },
-  },
-
-  control: {
-    height: 54,
-    paddingLeft: 38,
-    paddingRight: 38,
-
-    [BREAKPOINT]: {
-      height: 54,
-      paddingLeft: 18,
-      paddingRight: 18,
-      flex: 1,
-    },
-  },
-}));
-
 export default function HeroTitle() {
-  const { classes } = useStyles();
-
   return (
-    <div className={classes.wrapper}>
-      <Container size={700} className={classes.inner}>
-        <h1 className={classes.title}>
+    <div className="flex items-center justify-center bg-white dark:bg-dark-8">
+      <Container size={700}>
+        <Title
+          order={1}
+          weight={900}
+          className="m-0 py-[20px] text-[48px] leading-[1.1] text-black dark:text-white sm:py-0 sm:text-[62px]"
+        >
           A{" "}
           <Text
             component="span"
@@ -85,20 +20,22 @@ export default function HeroTitle() {
             quick
           </Text>{" "}
           way to decide on your next movie.
-        </h1>
+        </Title>
 
-        <Text className={classes.description} color="dimmed">
+        <Text className="mt-xl text-lg sm:text-xl" color="dimmed">
           Take the hassle out of movie night. Sign in with your Plex account and
-          select the movies you&apos;re interested in.
-          <Text weight="bold">We&apos;ll handle the rest.</Text>
+          select the movies you&apos;re interested in.{" "}
+          <Text weight={550} span>
+            We&apos;ll handle the rest.
+          </Text>
         </Text>
 
-        <Group className={classes.controls} position="center">
+        <Group className="mt-xl sm:mt-[48px]" position="center">
           <Link href="/setup" passHref>
             <Button
               component="a"
               size="xl"
-              className={classes.control}
+              className="h-14 flex-1 px-9 sm:flex-initial"
               variant="filled"
               color="yellow"
             >
@@ -111,7 +48,7 @@ export default function HeroTitle() {
             href="https://github.com/evan-buss/burning"
             size="xl"
             variant="default"
-            className={classes.control}
+            className="h-14 flex-1 px-9 sm:flex-initial"
           >
             GitHub
           </Button>
