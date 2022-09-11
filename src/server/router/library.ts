@@ -9,11 +9,7 @@ export const libraryRouter = createProtectedRouter()
           uuid: session.user.id,
         },
         include: {
-          libraries: {
-            include: {
-              server: true,
-            },
-          },
+          libraries: true,
         },
       });
 

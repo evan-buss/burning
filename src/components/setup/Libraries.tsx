@@ -1,13 +1,13 @@
 import { Button, Card, Text, Title } from "@mantine/core";
 import { StepProps } from ".";
-import { PlexServer } from "../../lib/plex/plex.model";
-import { useGetResources } from "../../lib/plex/plex.service";
+import { usePlexServers } from "../../lib/plex/hooks";
+import { PlexServer } from "../../lib/plex/models";
 import { trpc } from "../../utils/trpc";
 import { LibrarySelector, SelectableDirectory } from "../LibrarySelector";
 
 export default function SelectLibrariesStep({ done }: StepProps) {
   const upsertServers = trpc.useMutation("server.upsert");
-  const { data: servers } = useGetResources(async (servers) => {
+  const { data: servers } = usePlexServers(async (servers) => {
     await upsertServers.mutateAsync(
       servers.map((server) => ({
         address: server.preferredConnection,

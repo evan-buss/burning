@@ -268,22 +268,16 @@ export interface Part {
   hasChapterVideoStream?: boolean;
 }
 
-export interface Genre {
+interface ITag {
   tag: string;
 }
 
-export interface Director {
-  tag: string;
-}
+export type Genre = ITag;
 
-export interface Writer {
-  tag: string;
-}
+export type Director = ITag;
 
-export interface Country {
-  tag: string;
-}
+export type Writer = ITag;
 
-export interface Role {
-  tag: string;
-}
+export type Country = ITag;
+
+export type Role = ITag;

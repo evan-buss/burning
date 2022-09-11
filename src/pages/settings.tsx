@@ -3,12 +3,12 @@ import {
   LibrarySelector,
   SelectableDirectory,
 } from "../components/LibrarySelector";
-import { PlexServer } from "../lib/plex/plex.model";
-import { useGetResources } from "../lib/plex/plex.service";
+import { usePlexServers } from "../lib/plex/hooks";
+import { PlexServer } from "../lib/plex/models";
 import { trpc } from "../utils/trpc";
 
 export default function Settings() {
-  const { data: resources } = useGetResources();
+  const { data: resources } = usePlexServers();
   const toggleLibrary = trpc.useMutation("library.toggle");
 
   const handleToggle = async (

@@ -7,18 +7,17 @@ import {
   Loader,
   Title,
 } from "@mantine/core";
-import type { Library, Server } from "@prisma/client";
-import { useGetLibrary, useGetResources } from "../lib/plex/plex.service";
-import { usePlexState } from "../state/plex.store";
+import type { Library } from "@prisma/client";
+import { usePlexLibrary, usePlexServers } from "../lib/plex/hooks";
 import { trpc } from "../utils/trpc";
 
 export default function Dashboard() {
   const { data: libraries } = trpc.useQuery(["library.get"]);
-  const { data: resources } = useGetResources();
+  const { data: servers } = usePlexServers();
 
   return (
     <Container>
-      {resources &&
+      {servers &&
         libraries?.map((library) => (
           <LibrarySection key={library.key} library={library} />
         ))}
@@ -26,27 +25,12 @@ export default function Dashboard() {
   );
 }
 
-function LibrarySection({
-  library,
-}: {
-  library: Library & { server: Server };
-}) {
-  const accessToken = usePlexState(
-    (x) => x.byUUID[library.serverUUID]?.accessToken
-  );
-
-  const servers = usePlexState((x) => x.byUUID);
-
-  console.log("servers", servers);
-
-  if (!accessToken) throw new Error("don't have token for that server....");
-
-  const { data, isLoading } = useGetLibrary(
-    library.server.address,
-    accessToken,
+function LibrarySection({ library }: { library: Library }) {
+  console.log("Library", library);
+  const { data, isLoading, server } = usePlexLibrary(
+    library.serverUUID,
     library.key
   );
-  data && console.log(data);
 
   if (isLoading) {
     return <Loader></Loader>;
@@ -77,7 +61,7 @@ function LibrarySection({
             radius="md"
             alt={`${media.title} thumbnail`}
             key={media.key}
-            src={`${library.server.address}${media.thumb}?X-Plex-Token=${accessToken}`}
+            src={`${server.preferredConnection}${media.thumb}?X-Plex-Token=${server.accessToken}`}
           />
         )) ?? []}
       </div>

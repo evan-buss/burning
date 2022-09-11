@@ -14,15 +14,15 @@ import { useRouter } from "next/router";
 import { Fire, GearSix, MoonStars, SignOut, Sun } from "phosphor-react";
 import { CSSProperties } from "react";
 import { useQueryClient } from "react-query";
-import { User } from "../lib/plex/plex.model";
-import { useGetHomeUsers } from "../lib/plex/plex.service";
-import { signOut, useAuthState } from "../state/auth.store";
+import { usePlexProfiles } from "../lib/plex/hooks";
+import { User } from "../lib/plex/models";
+import { signOut, useBurningStore } from "../state/store";
 
 const HEADER_HEIGHT = 84;
 
 const useUser = () => {
-  const userId = useAuthState((state) => state.userId);
-  const { data } = useGetHomeUsers(true);
+  const userId = useBurningStore((state) => state.userId);
+  const { data } = usePlexProfiles(true);
   return data?.users.filter((user) => user.uuid === userId).at(0);
 };
 

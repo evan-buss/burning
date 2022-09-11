@@ -16,16 +16,16 @@ import { IPlexClientDetails, PlexOauth } from "plex-oauth";
 import { useEffect, useState } from "react";
 import { useLocalStorage } from "react-use";
 import { StepProps } from ".";
-import { useGetUserInfo } from "../../lib/plex/plex.service";
-import { setAccessToken, useAuthState } from "../../state/auth.store";
+import { useGetUserInfo } from "../../lib/plex/hooks";
+import { setAccessToken, useBurningStore } from "../../state/store";
 
 const usePlexAuth = () => {
   const { query, replace } = useRouter();
   const [url, setUrl] = useState<string | undefined>(undefined);
   const [pin, setPin, removePin] = useLocalStorage<number>("pin", 123);
 
-  const clientId = useAuthState((state) => state.clientId);
-  const accessToken = useAuthState((state) => state.accessToken);
+  const clientId = useBurningStore((state) => state.clientId);
+  const accessToken = useBurningStore((state) => state.accessToken);
 
   const clientInfo: IPlexClientDetails = {
     clientIdentifier: clientId, // This is a unique identifier used to identify your app with Plex.

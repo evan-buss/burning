@@ -12,18 +12,18 @@ import {
 import { useRouter } from "next/router";
 import { forwardRef } from "react";
 import { StepProps } from ".";
-import { useGetHomeUsers, useGetUserInfo } from "../../lib/plex/plex.service";
-import { setUserId, useAuthState } from "../../state/auth.store";
+import { useGetUserInfo, usePlexProfiles } from "../../lib/plex/hooks";
+import { setUserId, useBurningStore } from "../../state/store";
 import { trpc } from "../../utils/trpc";
 
 export default function ProfileStep({ done }: StepProps) {
   const { replace } = useRouter();
   const { data: account, isLoading: accountLoading } = useGetUserInfo();
-  const { data: homeUsers, isLoading: usersLoading } = useGetHomeUsers(
+  const { data: homeUsers, isLoading: usersLoading } = usePlexProfiles(
     !!account
   );
-  const userId = useAuthState((state) => state.userId);
-  const accessToken = useAuthState((state) => state.accessToken);
+  const userId = useBurningStore((state) => state.userId);
+  const accessToken = useBurningStore((state) => state.accessToken);
 
   const { data: user } = useGetUserInfo(!!accessToken);
   const { data: existingUser, isSuccess } = trpc.useQuery(

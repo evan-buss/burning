@@ -1,7 +1,7 @@
 import { Checkbox } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
-import { Directory, PlexServer } from "../lib/plex/plex.model";
-import { useGetServerLibraries } from "../lib/plex/plex.service";
+import { usePlexLibraries } from "../lib/plex/hooks";
+import { Directory, PlexServer } from "../lib/plex/models";
 import { trpc } from "../utils/trpc";
 import { sleep } from "../utils/utils";
 
@@ -20,13 +20,12 @@ export function LibrarySelector({
 }) {
   const [values, handlers] = useListState<SelectableDirectory>([]);
 
-  // Load all libraries for the server, keeping
-  const { data: libraries } = useGetServerLibraries(
-    server.preferredConnection,
-    server.accessToken,
-    ({ Directory: directory }) => {
+  // Load all libraries for the server, keeping any user selections.
+  const { data: libraries } = usePlexLibraries(
+    server.clientIdentifier,
+    ({ Directory }) => {
       handlers.setState(
-        directory.map(
+        Directory.map(
           (dir) =>
             ({
               ...dir,
