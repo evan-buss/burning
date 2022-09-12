@@ -3,7 +3,7 @@ import {
   Container,
   Menu,
   Transition,
-  useMantineColorScheme,
+  useMantineColorScheme
 } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { useRouter } from "next/router";
@@ -19,7 +19,7 @@ import Topbar from "../Topbar";
 const useUser = () => {
   const userId = useBurningStore((state) => state.userId);
   const { data } = usePlexProfiles(!!userId);
-  return data?.users.filter((user) => user.uuid === userId).at(0);
+  return data?.users?.filter((user) => user.uuid === userId).at(0);
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
