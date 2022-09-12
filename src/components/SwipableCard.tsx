@@ -24,7 +24,7 @@ export const SwipableCard = ({
   const x = useMotionValue(0);
   const controls = useAnimation();
 
-  const [constrained, setConstrained] = useState(true);
+  const [constrained, setConstrained] = useState(false);
   const [direction, setDirection] = useState<Direction>(undefined);
   const [velocity, setVelocity] = useState(0);
 

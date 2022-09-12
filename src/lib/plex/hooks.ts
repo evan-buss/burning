@@ -2,9 +2,9 @@ import { useQuery } from "react-query";
 import { useBurningStore, usePlexCredentials } from "../../state/store";
 import {
   getLibrary,
-  getPlexHomeUsers as getPlexProfiles,
+  getPlexProfiles,
   getPlexServers,
-  getServerLibraries as getPlexLibraries,
+  getPlexServerLibraries,
   getUserInfo,
 } from "./api";
 import { MediaContainer, PlexServer } from "./models";
@@ -62,7 +62,7 @@ export function usePlexLibraries(
   return useQuery(
     ["plex, libraries", serverId],
     () =>
-      getPlexLibraries(
+      getPlexServerLibraries(
         server.preferredConnection,
         server.accessToken,
         clientId

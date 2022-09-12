@@ -9,7 +9,7 @@ import {
   UsersRoot,
 } from "./models";
 
-export async function getPlexHomeUsers(
+export async function getPlexProfiles(
   accessToken: string,
   clientId: string
 ): Promise<UsersRoot> {
@@ -89,7 +89,7 @@ export async function getPlexServers(
   return data;
 }
 
-export async function getServerLibraries(
+export async function getPlexServerLibraries(
   serverAddress: string,
   accessToken: string,
   clientId: string

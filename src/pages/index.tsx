@@ -5,8 +5,8 @@ import AnonLayout from "../components/layout/AnonLayout";
 
 export default function HomePage() {
   return (
-    <div className="flex items-center justify-center bg-white dark:bg-dark-8">
-      <Container size={700}>
+    <div className="flex h-full items-center justify-center">
+      <section>
         <Title
           order={1}
           weight={900}
@@ -16,7 +16,7 @@ export default function HomePage() {
           <Text
             component="span"
             variant="gradient"
-            gradient={{ from: "yellow", to: "gray" }}
+            gradient={{ from: "yellow.8", to: "yellow.5" }}
             inherit
           >
             quick
@@ -54,9 +54,9 @@ export default function HomePage() {
           >
             GitHub
           </Button>
+          {/* <Image src={Campfire} /> */}
         </Group>
-        {/* <Image src={Campfire} /> */}
-      </Container>
+      </section>
     </div>
   );
 }

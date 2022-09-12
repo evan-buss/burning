@@ -3,16 +3,21 @@ import {
   Container,
   Menu,
   Transition,
-  useMantineColorScheme
+  useMantineColorScheme,
 } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { useRouter } from "next/router";
 import { GearSix, MoonStars, SignOut, Sun } from "phosphor-react";
-import React, { CSSProperties } from "react";
+import React, { CSSProperties, useEffect } from "react";
 import { useQueryClient } from "react-query";
+import { getPlexServerLibraries, getPlexServers } from "../../lib/plex/api";
 import { usePlexProfiles } from "../../lib/plex/hooks";
 import { User } from "../../lib/plex/models";
-import { resetUserState, useBurningStore } from "../../state/store";
+import {
+  resetUserState,
+  useBurningStore,
+  usePlexCredentials,
+} from "../../state/store";
 import { trpc } from "../../utils/trpc";
 import Topbar from "../Topbar";
 
@@ -24,9 +29,26 @@ const useUser = () => {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const user = useUser();
+  const { accessToken, clientId } = usePlexCredentials();
+
+  useEffect(() => {
+    const loadPlexState = async () => {
+      const servers = await getPlexServers(accessToken, clientId);
+      for (const server of servers) {
+        await getPlexServerLibraries(
+          server.preferredConnection,
+          server.accessToken,
+
+          clientId
+        );
+      }
+    };
+
+    loadPlexState();
+  }, [accessToken, clientId, user?.uuid]);
 
   return (
-    <>
+    <div id="wrapper" className="bg-white dark:bg-dark-8">
       <Topbar>
         <Transition
           transition="fade"
@@ -38,8 +60,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Transition>
       </Topbar>
 
-      <Container size="lg">{children}</Container>
-    </>
+      <Container size="lg" id="page-content" py="xl">
+        {children}
+      </Container>
+    </div>
   );
 }
 

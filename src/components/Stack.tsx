@@ -12,11 +12,8 @@ export const Stack = ({ onVote, children, ...props }: StackProps) => {
   const [stack, setStack] = useState<ReactNode[]>(Children.toArray(children));
 
   // return new array with last item removed
-  const pop = (array: ReactNode[]) => {
-    return array.filter((_, index) => {
-      return index < array.length - 1;
-    });
-  };
+  const pop = (array: ReactNode[]) =>
+    array.filter((_, index) => index < array.length - 1);
 
   const handleVote = (item: ReactNode, vote: boolean) => {
     // update the stack
@@ -28,19 +25,19 @@ export const Stack = ({ onVote, children, ...props }: StackProps) => {
   };
 
   return (
-      <div className="relative flex items-center justify-center w-full overflow-hidden">
-        {stack.map((item: ReactNode, index) => {
-          const isTop = index === stack.length - 1;
-          return (
-            <Card
-              drag={isTop} // Only top card is draggable
-              key={index}
-              onVote={(result) => handleVote(item, result)}
-            >
-              {item}
-            </Card>
-          );
-        })}
-      </div>
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
+      {stack.map((item: ReactNode, index) => {
+        const isTop = index === stack.length - 1;
+        return (
+          <Card
+            drag={isTop} // Only top card is draggable
+            key={index}
+            onVote={(result) => handleVote(item, result)}
+          >
+            {item}
+          </Card>
+        );
+      })}
+    </div>
   );
 };

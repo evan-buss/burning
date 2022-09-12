@@ -13,7 +13,7 @@ import { getCookie, setCookie } from "cookies-next";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { AppProps } from "next/app";
 import Head from "next/head";
-import { ReactElement, ReactNode, useState } from "react";
+import { ReactElement, ReactNode, useEffect, useState } from "react";
 import { ReactQueryDevtools } from "react-query/devtools";
 import superjson from "superjson";
 import Layout from "../components/layout/Layout";
@@ -36,6 +36,10 @@ export function MyApp({ Component, pageProps }: CustomAppProps) {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(
     pageProps.colorScheme
   );
+
+  useEffect(() => {
+    document.querySelector("body")?.classList.toggle("dark");
+  }, [colorScheme]);
 
   const toggleColorScheme = (value?: ColorScheme) => {
     const nextColorScheme =

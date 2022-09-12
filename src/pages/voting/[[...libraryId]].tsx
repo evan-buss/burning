@@ -1,52 +1,43 @@
 import styled from "@emotion/styled";
+import { Image, Title } from "@mantine/core";
 import { useRouter } from "next/router";
 import { Stack } from "../../components/Stack";
+import { usePlexLibrary } from "../../lib/plex/hooks";
+import { useBurningStore } from "../../state/store";
 
 export default function VotePage() {
   const router = useRouter();
+  const { libraryId } = router.query;
 
-  const Wrapper = styled(Stack)`
-    background: #1f2937;
-  `;
+  const library = useBurningStore(
+    (state) => state.libraries.byUUID[libraryId as string]
+  );
+  console.log(library);
+  const servers = useBurningStore((x) => x.servers.byUUID);
 
-  const Item = styled.div`
-    background: #f9fafb;
-    width: 200px;
-    height: 250px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 80px;
-    text-shadow: 0 10px 10px #d1d5db;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-    transform: ${() => {
-      const rotation = Math.random() * (5 - -5) + -5;
-      return `rotate(${rotation}deg)`;
-    }};
-  `;
+  const { data, isLoading } = usePlexLibrary(
+    (Object.values(servers)[0] as any).clientIdentifier,
+    library.key
+  );
 
   return (
     <>
+      <Title order={2}>{library?.title}</Title>
       <Stack onVote={(item, vote) => console.log((item as any).props, vote)}>
-        <div
-          className="width-[200px] height-[250px] flex items-center justify-center rounded-md bg-[#f9fafb] text-[80px] shadow"
-          data-value="waffles"
-        >
-          🧇
-        </div>
-        <div
-          className="width-[200px] height-[250px] flex items-center justify-center rounded-md bg-[#f9fafb] text-[80px] shadow"
-          data-value="pancakes"
-        >
-          🥞
-        </div>
-        <div
-          className="width-[200px] height-[250px] flex items-center justify-center rounded-md bg-[#f9fafb] text-[80px] shadow"
-          data-value="donuts"
-        >
-          🍩
-        </div>
+        {data?.Metadata.slice(0, 1).map((content) => (
+          <img
+            key={content.key}
+            data-value={content.key}
+            className="flex items-center justify-center rounded-md bg-[#f9fafb] text-[80px] shadow"
+            style={{
+              transform: `rotate(${Math.random() * (5 - -5) + -5}deg)`,
+            }}
+            height={500}
+            width="auto"
+            alt={`${content.title} thumbnail`}
+            src={`${library.connection}${content.thumb}?X-Plex-Token=${library.accessToken}`}
+          />
+        ))}
       </Stack>
     </>
   );

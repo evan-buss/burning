@@ -39,7 +39,7 @@ export default function CompletedStep({ done }: CompletedStepProps) {
           onClick={done}
           variant="gradient"
           size="lg"
-          gradient={{ from: "yellow.5", to: "yellow.8" }}
+          gradient={{ from: "yellow.8", to: "yellow.5" }}
           mt="md"
         >
           Start Swiping
