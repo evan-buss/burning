@@ -8,7 +8,7 @@ import {
   Text,
   Title,
   Tooltip,
-  Transition,
+  Transition
 } from "@mantine/core";
 import { useRouter } from "next/router";
 import { ArrowCounterClockwise } from "phosphor-react";
@@ -30,7 +30,7 @@ const usePlexAuth = () => {
     product: "Burning for Plex", // Name of your application
     device: "Burning for Plex", // The type of device your application is running on
     version: "1", // Version of your application
-    forwardUrl: `${process.env.NEXT_PUBLIC_URL}/setup?postback=true`, // Optional - Url to forward back to after signing in.
+    forwardUrl: `${process.env.NEXT_PUBLIC_VERCEL_URL}/setup?postback=true`, // Optional - Url to forward back to after signing in.
     platform: "Web", // Optional - Platform your application runs on - Defaults to 'Web'
     urlencode: true, // Optional - If set to true, the output URL is url encoded, otherwise if not specified or 'false', the output URL will return as-is
   };
