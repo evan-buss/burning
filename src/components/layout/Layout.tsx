@@ -3,7 +3,7 @@ import {
   Container,
   Menu,
   Transition,
-  useMantineColorScheme,
+  useMantineColorScheme
 } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { useRouter } from "next/router";
@@ -16,7 +16,7 @@ import { User } from "../../lib/plex/models";
 import {
   resetUserState,
   useBurningStore,
-  usePlexCredentials,
+  usePlexCredentials
 } from "../../state/store";
 import { trpc } from "../../utils/trpc";
 import Topbar from "../Topbar";
@@ -33,6 +33,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const loadPlexState = async () => {
+      if (!accessToken) return;
       const servers = await getPlexServers(accessToken, clientId);
       for (const server of servers) {
         await getPlexServerLibraries(
