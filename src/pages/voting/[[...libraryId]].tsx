@@ -1,5 +1,4 @@
-import styled from "@emotion/styled";
-import { Image, Title } from "@mantine/core";
+import { Title } from "@mantine/core";
 import { useRouter } from "next/router";
 import { Stack } from "../../components/Stack";
 import { usePlexLibrary } from "../../lib/plex/hooks";
@@ -17,7 +16,7 @@ export default function VotePage() {
 
   const { data, isLoading } = usePlexLibrary(
     (Object.values(servers)[0] as any).clientIdentifier,
-    library.key
+    library?.key ?? ""
   );
 
   return (
@@ -35,7 +34,7 @@ export default function VotePage() {
             height={500}
             width="auto"
             alt={`${content.title} thumbnail`}
-            src={`${library.connection}${content.thumb}?X-Plex-Token=${library.accessToken}`}
+            src={`${library?.connection}${content.thumb}?X-Plex-Token=${library?.accessToken}`}
           />
         ))}
       </Stack>

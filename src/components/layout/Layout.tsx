@@ -3,7 +3,7 @@ import {
   Container,
   Menu,
   Transition,
-  useMantineColorScheme
+  useMantineColorScheme,
 } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { useRouter } from "next/router";
@@ -16,7 +16,7 @@ import { User } from "../../lib/plex/models";
 import {
   resetUserState,
   useBurningStore,
-  usePlexCredentials
+  usePlexCredentials,
 } from "../../state/store";
 import { trpc } from "../../utils/trpc";
 import Topbar from "../Topbar";
