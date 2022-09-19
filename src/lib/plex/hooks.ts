@@ -3,11 +3,11 @@ import { useBurningStore, usePlexCredentials } from "../../state/store";
 import {
   getLibrary,
   getPlexProfiles,
-  getPlexServers,
   getPlexServerLibraries,
+  getPlexServers,
   getUserInfo,
 } from "./api";
-import { MediaContainer, PlexServer } from "./models";
+import { MediaContainer, PlexLibraryMetadata, PlexServer } from "./models";
 
 // Get account details for the signin in user.
 export function usePlexAccount(enabled: boolean) {
@@ -73,20 +73,29 @@ export function usePlexLibraries(
   );
 }
 
-export function usePlexLibrary(serverId: string, libraryKey: string) {
+export function usePlexLibrary(
+  serverId: string,
+  libraryKey: string,
+  onSuccess?: (data: PlexLibraryMetadata) => void
+) {
   const { clientId } = usePlexCredentials();
   const server = useBurningStore((x) => x.servers.byUUID[serverId]);
 
   console.log("server:", serverId, "accessToken", server?.accessToken);
   if (!server) throw new Error(`unable to find server ${serverId}`);
 
-  const query = useQuery(["plex", "libraries", serverId, libraryKey], () =>
-    getLibrary(
-      server.preferredConnection,
-      server.accessToken,
-      clientId,
-      libraryKey
-    )
+  const query = useQuery(
+    ["plex", "libraries", serverId, libraryKey],
+    () =>
+      getLibrary(
+        server.preferredConnection,
+        server.accessToken,
+        clientId,
+        libraryKey
+      ),
+    {
+      onSuccess,
+    }
   );
 
   return { ...query, server };

@@ -61,7 +61,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Transition>
       </Topbar>
 
-      <Container size="lg" id="page-content" py="xl">
+      <Container size="lg" id="page-content" p="xl">
         {children}
       </Container>
     </div>
@@ -88,17 +88,12 @@ function UserMenu({
   };
 
   return (
-    <Menu trigger="hover" shadow="md" width={200}>
+    <Menu shadow="md" width={200}>
       <Menu.Target>
         <Avatar
           style={style}
-          styles={{
-            image: {
-              cursor: "pointer",
-              "&:hover": {
-                opacity: 0.8,
-              },
-            },
+          classNames={{
+            image: "hover:opacity-80 cursor-pointer",
           }}
           src={user?.thumb}
           radius={40}

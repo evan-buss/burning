@@ -13,4 +13,7 @@ function defineNextConfig(config) {
 export default defineNextConfig({
   reactStrictMode: false,
   swcMinify: true,
+  images: {
+    domains: ["m.media-amazon.com"],
+  },
 });

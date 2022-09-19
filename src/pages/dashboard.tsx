@@ -1,10 +1,8 @@
 import {
   Button,
   Card,
-  Center,
   Group,
   Image,
-  Loader,
   ScrollArea,
   Skeleton,
   Stack,
@@ -36,7 +34,7 @@ function LibrarySection({ library }: { library: Library }) {
   );
 
   return (
-    <Card className="mx-0 overflow-auto sm:m-xl" withBorder>
+    <Card p="xl" mb="xl" className="overflow-auto" withBorder>
       {isLoading ? (
         <Stack>
           <Skeleton height={36} width="25%" animate={false} />
@@ -68,7 +66,7 @@ function LibrarySection({ library }: { library: Library }) {
           </Group>
 
           <ScrollArea>
-            <div className="relative mt-md flex flex-row gap-2 overflow-auto rounded-md pb-sm">
+            <div className="relative flex flex-row gap-2 overflow-auto rounded-md mt-md pb-sm">
               {data?.Metadata?.slice(0, 10).map((media) => (
                 <Image
                   key={media.key}
