@@ -28,6 +28,8 @@ export const createContext = async ({
   req,
   res,
 }: trpcNext.CreateNextContextOptions) => {
+  console.log("creating context???");
+  console.log(prisma);
   return {
     ...(await createContextInner({})),
     req,
